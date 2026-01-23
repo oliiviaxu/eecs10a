@@ -97,6 +97,10 @@ Clock           pin 39;                 "input   clock
 " declared here as:
 " Signal_name   node;
 
+Cu_2 node;
+Cu_3 node;
+Cd_2 node;
+Cd_3 node;
 
 
 " Macros
