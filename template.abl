@@ -143,8 +143,8 @@ Q1  :=  (!CountDown & ((!Q1 & Q0 & !Q3) # (Q1 & !Q0))) # (CountDown & ((!Q1 & !Q
 Q2  :=  (!CountDown & ((Q1 & Q0 & !Q2) # (!Q1 & Q2) # (Q2 & !Q0))) # (CountDown & ((Q3 & !Q0) # (Q0 & Q2) # (Q1 & Q2)));
 Q3  :=  (!CountDown & ((Q1 & Q0 & Q2) # (Q3 & !Q0))) # (CountDown & ((!Q3 & !Q2 & !Q1 & !Q0) # (Q0 & Q3)));
 
-Cu_2  =  (Q3 & Q0);
-Cd_2  =  (!Q3 & !Q2 & !Q1 & !Q0);
+Cu_2  =  (Q3 & Q0);                             " enable next digit to increment at 9
+Cd_2  =  (!Q3 & !Q2 & !Q1 & !Q0);               " enable next digit to decrement at 0
 
 " middle digit
 "    hold value when counting is not enabled
@@ -154,8 +154,8 @@ Q5  :=  (!CountDown & ((!Q5 & Q4 & !Q7 & Cu_2) # (Q5 & !Cu_2) # (Q5 & !Q4))) # (
 Q6  :=  (!CountDown & ((Q5 & Q4 & !Q6 & Cu_2) # (!Q5 & Q6) # (Q6 & !Q4) # (Q6 & !Cu_2))) # (CountDown & ((Q7 & !Q4 & Cd_2) # (Q4 & Q6) # (Q5 & Q6) # (Q6 & !Cd_2)));
 Q7  :=  (!CountDown & ((Q5 & Q4 & Q6 & Cu_2) # (Q7 & !Q4) # (Q7 & !Cu_2))) # (CountDown & ((!Q7 & !Q6 & !Q5 & !Q4 & Cd_2) # (Q4 & Q7) # (Q7 & !Cd_2))); 
 
-Cu_3  =  Cu_2 & (Q7 & Q4);
-Cd_3  =  Cd_2 & (!Q7 & !Q6 & !Q5 & !Q4);
+Cu_3  =  Cu_2 & (Q7 & Q4);                      " enable next digit to increment at 9
+Cd_3  =  Cd_2 & (!Q7 & !Q6 & !Q5 & !Q4);        " enable next digit to decrement at 0
 
 
 " high order digit
