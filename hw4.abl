@@ -129,14 +129,14 @@ CarryOut2  =  (A2 & (B2 $ Subtract)) # (CarryOut1 & (A2 $ (B2 $ Subtract)));
 
 Sum3       =  A3 $ (B3 $ Subtract) $ CarryOut2;
 
-Sum4  =  (A3 & (B3 $ Subtract)) # (CarryOut2 & (A3 $ (B3 $ Subtract)));
+Sum4  =  Subtract $ ((A3 & (B3 $ Subtract)) # (CarryOut2 & (A3 $ (B3 $ Subtract))));
 
 
 " compute the flags
 Carry = Sum4 $ Subtract;
 Zero = !Sum0 & !Sum1 & !Sum2 & !Sum3 & !Sum4;
 Sign = Sum3;
-Overflow = CarryOut2 $ Sum4;
+Overflow = CarryOut2 $ (Sum4 $ Subtract);
 
 " compute unsigned comparisons
 
