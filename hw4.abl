@@ -15,7 +15,7 @@ TITLE      'Adder/Subtracter with Flags'
 " Revision History:
 " 02/04/26   Olivia Xu  Initial Revision
 " 02/04/26   Olivia Xu  Fixed logic 
-" 04/25/07   Glen George  Fixed reversal of SignedGT and SignedLT outputs
+" 02/04/26   Olivia Xu  Changed UnsignedGT
 "                         (label on PCB is wrong)
 " 10/24/07   Glen George  Changed pinout and Subtract polarity to match new
 "                         PCB
@@ -148,7 +148,7 @@ UnsignedLT  =  !(UnsignedGT # UnsignedEQ);
 
 UnsignedEQ = Zero;
 
-UnsignedGT = Sum4 & !Zero;
+UnsignedGT = !Carry & !Zero;
 
 " compute signed comparisons
 
