@@ -91,8 +91,15 @@ Clock           pin 39;                 "input   clock
 " declared here as:
 " Signal_name   node;
 
+" Carry signals for counting UP (Cu = Carry Up)
+"   Cu_2: Carry from digit 0 to digit 1 (asserted when digit 0 reaches 9)
+"   Cu_3: Carry from digit 1 to digit 2 (asserted when digits 0-1 reach 99)
 Cu_2 node;
 Cu_3 node;
+
+" Borrow signals for counting DOWN (Cd = Carry Down / Borrow)
+"   Cd_2: Borrow from digit 1 to digit 0 (asserted when digit 0 reaches 0)
+"   Cd_3: Borrow from digit 2 to digit 1 (asserted when digits 0-1 reach 00)
 Cd_2 node;
 Cd_3 node;
 
