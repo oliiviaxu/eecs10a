@@ -16,15 +16,8 @@ TITLE      'Adder/Subtracter with Flags'
 " 02/04/26   Olivia Xu  Initial Revision
 " 02/04/26   Olivia Xu  Fixed logic 
 " 02/04/26   Olivia Xu  Changed UnsignedGT
-"                         (label on PCB is wrong)
-" 10/24/07   Glen George  Changed pinout and Subtract polarity to match new
-"                         PCB
-" 10/24/07   Glen George  Changed file to match the new assignment
-" 10/24/07   Glen George  Updated comments
-" 11/02/08   Glen George  Updated comments
-" 01/12/18   Glen George  Changed pinout to match new PCB (v3.0)
-" 01/04/21   Glen George  Updated comments
-
+" 02/04/26   Olivia Xu  Added XOR with Sum4 and Subtract
+" 02/04/26   Olivia Xu  Added comments
 
 
 " Pins
