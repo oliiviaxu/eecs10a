@@ -137,7 +137,7 @@ Sum4  =  (A3 & (B3 $ Subtract)) # (CarryOut2 & (A3 $ (B3 $ Subtract)));
 
 " compute the flags
 Carry = Sum4 $ Subtract;
-Zero = !Sum0 & !Sum1 & !Sum2 & !Sum3;
+Zero = !Sum0 & !Sum1 & !Sum2 & !Sum3 & !Sum4;
 Sign = Sum3;
 Overflow = CarryOut2 $ Sum4;
 
@@ -145,18 +145,14 @@ Overflow = CarryOut2 $ Sum4;
 
 " less than is just not greater than or equal
 UnsignedLT  =  !(UnsignedGT # UnsignedEQ);
-
 UnsignedEQ = Zero;
-
 UnsignedGT = !Carry & !Zero;
 
 " compute signed comparisons
 
 " less than is just not greater than or equal
 SignedLT  =  !(SignedGT # SignedEQ);
-
 SignedEQ = Zero;
-
 SignedGT = !Zero & !(Sign $ Overflow);
 
 END  addsub
