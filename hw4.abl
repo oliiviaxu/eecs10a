@@ -14,7 +14,7 @@ TITLE      'Adder/Subtracter with Flags'
 
 " Revision History:
 " 02/04/26   Olivia Xu  Initial Revision
-" 02/04/26   Olivia Xu  Fixed logic so add and subtract work 
+" 02/04/26   Olivia Xu  Fixed logic 
 " 04/25/07   Glen George  Fixed reversal of SignedGT and SignedLT outputs
 "                         (label on PCB is wrong)
 " 10/24/07   Glen George  Changed pinout and Subtract polarity to match new
@@ -121,7 +121,7 @@ EQUATIONS
 
 " a 1-bit full adder (for the ith bit)
 "    note that CarryIn[i] = CarryOut[i - 1]
-Sum0       =  A0 $ B0 $ Subtract;
+Sum0       =  A0 $ B0;
 CarryOut0  =  (A0 & (B0 $ Subtract)) # (Subtract & (A0 $ (B0 $ Subtract)));
 
 Sum1       =  A1 $ (B1 $ Subtract) $ CarryOut0;
