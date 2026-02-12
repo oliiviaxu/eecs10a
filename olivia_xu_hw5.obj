@@ -1,0 +1,46 @@
+; This subroutine computes the GCD of two unsigned 8-bit integers using
+; Euclid's algorithm by repeated subtraction.
+;
+; The input values are stored in memory in Ain and Bin.  The subroutine makes
+; working copies (a and b) and returns the GCD in the accumulator.
+;
+; Revision History
+;    11 Feb 26   Olivia Xu        Initial revision
+;    11 Feb 26   Olivia Xu        Updated comments / formatting
+
+
+;0000           start:			    ;initialize variables
+0000  8001;         LDD   b         ;get the value of b in accumulator
+0001  3300;         CMPI  0         ;check if b is 0
+0002  9F11;         JZ    Done      ;if b is now 0, we're done
+0003  1F80;         NOP             ;branch slot
+
+;0004           GCDLoop:			;loop, computing GCD
+0004  8000;         LDD   a         ;get the value of a in accumulator
+0005  3001;         CMP   b         ;compare the value in accumulator (a) with b
+0006  8F05;         JB    Swap      ;if a < b
+0007  1F80;         NOP             ;branch slot
+0008  1001;         SUB   b         ;subtract b from a
+0009  A000;         STD   a         ;store the value in a
+000A  C004;         JMP   GCDLoop   ;repeat 
+000B  1F80;         NOP             ;branch slot
+
+;000C           Swap:
+000C  8000;         LDD   a		    ;get a
+000D  0780;         TAX			    ;and put it in X temporarily
+000E  8001;         LDD   b		    ;now get b
+000F  A000;         STD   a		    ;and store it in a
+0010  6701;         TXA			    ;get original a back
+0011  A001;         STD   b		    ;and store it in b
+0012  C000;         JMP   start     ;jump back to start to repeat
+0013  1F80;         NOP             ;branch slot
+
+;0014           Done:			    ;
+0014  8000;         LDD   a			;GCD is a
+0015  1F00;         RTS             ;and return
+
+
+; Variables
+
+;00        a       DB    ?         ;first input value
+;01        b       DB    ?         ;second input value
