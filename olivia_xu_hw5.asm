@@ -1,15 +1,19 @@
-; This subroutine computes the GCD of two unsigned 8-bit integers using
+; This subroutine computes the GCD of two 8-bit integers using
 ; Euclid's algorithm by repeated subtraction.
 ;
-; The input values are stored in memory in Ain and Bin.  The subroutine makes
-; working copies (a and b) and returns the GCD in the accumulator.
+; Inputs:
+;    a - first 8-bit value (stored in memory)
+;    b - second 8-bit value (stored in memory)
+;
+; Outputs:
+;    Accumulator - contains the GCD of a and b on return
 ;
 ; Revision History
 ;    11 Feb 26   Olivia Xu        Initial revision
 ;    11 Feb 26   Olivia Xu        Updated comments / formatting
 
 
-            start:			    ;initialize variables
+            start:			    ;check if b is zero
                 LDD   b         ;get the value of b in accumulator
                 CMPI  0         ;check if b is 0
                 JZ    Done      ;if b is now 0, we're done
