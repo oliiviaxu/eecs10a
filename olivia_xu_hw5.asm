@@ -13,17 +13,17 @@
                 LDD   b         ;get the value of b in accumulator
                 CMPI  0         ;check if b is 0
                 JZ    Done      ;if b is now 0, we're done
-                NOP             ;
+                NOP             ;branch slot
 
             GCDLoop:			;loop, computing GCD
                 LDD   a         ;get the value of a in accumulator
                 CMP   b         ;compare the value in accumulator (a) with b
-                JB    Swap      ;if a < b
-                NOP             ;
+                JB    Swap      ;if a < b, swap
+                NOP             ;branch slot
                 SUB   b         ;subtract b from a
                 STD   a         ;store the value in a
                 JMP   GCDLoop   ;repeat 
-                NOP             ;
+                NOP             ;branch slot
 
             Swap:
                 LDD   a		    ;get a
@@ -33,9 +33,9 @@
                 TXA			    ;get original a back
                 STD   b		    ;and store it in b
                 JMP   start     ;jump back to start to repeat
-                NOP             ;
+                NOP             ;branch slot
 
-            Done:			    ;
+            Done:			    
                 LDD   a			;GCD is a
                 RTS             ;and return
 
