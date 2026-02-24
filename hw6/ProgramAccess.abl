@@ -26,9 +26,7 @@ TITLE           'Program Memory Unit'
 " Revision History:
 " 02/23/26   Olivia Xu  Initial Revision
 " 02/23/26   Olivia Xu  Fixed some typos
-" 02/23/26   Glen George  Specialized for Program Memory Access Unit
-" 02/23/26   Glen George  Updated comments
-" 02/23/26   Glen George  Updated comments
+" 02/23/26   Olivia Xu  Bug fix related to RelativeAddressing confusion
 
 
 " Pin/Signal Declarations
@@ -85,7 +83,7 @@ Relative = Increment # RelativeAddressing # Hold;
 SOffset = [Offset7, Offset7, Offset7, Offset7, Offset7, Offset7..Offset0];
 
 MuxOut  =  (Increment & ONE) #          
-            (Relative & SOffset) #          
+            (RelativeAddressing & SOffset) #          
             (Absolute & Direct) #          
             (RTS1 & [0, 0, 0, 0, 0, Offset7..Offset0]) # 
             (RTS2 & [Offset4..Offset0, PC7..PC0]) # 

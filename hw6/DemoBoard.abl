@@ -112,7 +112,7 @@ PAUnit.[Direct12..Direct0]  =  [AddrData12..AddrData0];
 
 PAUnit.Increment = Control0;
 PAUnit.Absolute = Control1;
-PAUnit.RelativeAddressing = Control2;
+PAUnit.RelativeAddressing = Control2; 
 PAUnit.RTS1 = Control3;
 PAUnit.RTS2 = Control4;
 
