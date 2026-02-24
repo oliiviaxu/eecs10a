@@ -114,7 +114,7 @@ PAUnit.Increment = Control0;
 PAUnit.Absolute = Control1;
 PAUnit.RelativeAddressing = Control2;
 PAUnit.RTS1 = Control3;
-PAUNit.RTS2 = Control4;
+PAUnit.RTS2 = Control4;
 
 PAUnit.Reset  =  Reset;
 PAUnit.Clock  =  Clock;
