@@ -76,11 +76,11 @@ EQUATIONS
 " clocks 
 
 PC.CLK = Clock;
-PC.CLR = Reset;
+PC.CLR = !Reset;
 
 Hold = !(Increment # RelativeAddressing # Absolute # RTS1 # RTS2);
 
-Relative = Increment # RelativeAddressing;
+Relative = Increment # RelativeAddressing # Hold;
 
 SOffset = [Offset7, Offset7, Offset7, Offset7, Offset7, Offset7..Offset0];
 
@@ -97,6 +97,6 @@ Carry0 = 0;
 [Carry13..Carry1] = ((PC & Relative) & MuxOut) # ([Carry12..Carry0] & ((PC & Relative) $ MuxOut)); " PC & Relative are A0, MuxOut is B0 (from HW4)
 PC := (PC & Relative) $ MuxOut $ [Carry12..Carry0];
 
-ProgAddr = ONE;
+ProgAddr = PC;
 
 END ProgramAccess
