@@ -35,20 +35,20 @@ TITLE           'Program Memory Unit'
 
 " Inputs 
 
-Offset7..Offset0            pin;        
-Direct12..Direct0           pin;       
-RelativeAddressing          pin;     
-Increment                   pin;           
-Absolute                    pin;            
-RTS1                        pin;
-RTS2                        pin;
+Offset7..Offset0            pin;    "input  8 bits of offset or data    
+Direct12..Direct0           pin;    "input  13 bits of address or data      
+RelativeAddressing          pin;    "input  control signal for relative addressing    
+Increment                   pin;    "input  control signal for incrementing (step)       
+Absolute                    pin;    "input  control signal for direct / absolute address        
+RTS1                        pin;    "input  control signal for updating lower 8 bits of address
+RTS2                        pin;    "input  control signal for updating upper 5 bits of address
 Reset			            pin;	"input  system reset
 Clock           	        pin;	"input  system clock
 
 " Outputs
 
-ProgAddr12..ProgAddr0       pin;
-PC12..PC0                   pin ISTYPE 'REG, KEEP';     " TODO: what is this for
+ProgAddr12..ProgAddr0       pin;                            "output  13 bits of program address bus
+PC12..PC0                   pin ISTYPE 'REG, KEEP';         "output  13 bits of program counter
 
 " Constants
 
@@ -57,18 +57,18 @@ ONE   =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ];    " 13-bit value of 1
 " Intermediate Terms
 
 Relative                   node;  "Relative signal into the and gate    
-SOffset12..SOffset0        node;  
-MuxOut12..MuxOut0          node; 
-Carry13..Carry0            node;
-Hold                       node;
+SOffset12..SOffset0        node;  "Sign-extended 13-bit version of 8-bit offset
+MuxOut12..MuxOut0          node;  "13 bits of mux output
+Carry13..Carry0            node;  "14 bits of carry for adding PC and MuxOut
+Hold                       node;  
 
 " Buses
-Offset = [Offset7..Offset0];
-SOffset = [SOffset12..SOffset0];        "Sign extended offset
+Offset = [Offset7..Offset0];            
+SOffset = [SOffset12..SOffset0];        
 Direct = [Direct12..Direct0];
 ProgAddr = [ProgAddr12..ProgAddr0];
 MuxOut = [MuxOut12..MuxOut0];
-Carry = [Carry13..Carry0];              "13 bits of carry for adding
+Carry = [Carry13..Carry0];              
 PC = [PC12..PC0];                   
 
 EQUATIONS
@@ -91,7 +91,7 @@ MuxOut  =  (Increment & ONE) #
             (RTS2 & [Offset4..Offset0, PC7..PC0]) # 
             (Hold & 0);
 
-" We are trying to do PC := (Relative & PC) + MuxOut;
+" We are trying to do PC := (Relative & PC) + MuxOut (from the lecture slides);
 
 Carry0 = 0;
 [Carry13..Carry1] = ((PC & Relative) & MuxOut) # ([Carry12..Carry0] & ((PC & Relative) $ MuxOut)); " PC & Relative are A0, MuxOut is B0 (from HW4)
