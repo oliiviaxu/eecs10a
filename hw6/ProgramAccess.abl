@@ -1,10 +1,10 @@
-MODULE ProgramAccess
-ProgramAccess INTERFACE  (Offset7..Offset0, Direct12..Direct0,
+MODULE          ProgramAccess
+INTERFACE       (Offset7..Offset0, Direct12..Direct0,
                           RelativeAddressing, Increment, Absolute, RTS1, RTS2,
                           Reset, Clock
                           -> ProgAddr12..ProgAddr0, PC12..PC0);
 
-TITLE  'Program Memory Unit'
+TITLE           'Program Memory Unit'
 
 " Description:  This module implements the  
 "
