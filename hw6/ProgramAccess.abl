@@ -4,7 +4,7 @@ ProgramAccess INTERFACE  (Offset7..Offset0, Direct12..Direct0,
                           Reset, Clock
                           -> ProgAddr12..ProgAddr0, PC12..PC0);
 
-TITLE  Program Memory Unit
+TITLE  'Program Memory Unit'
 
 " Description:  This module implements the  
 "
@@ -82,7 +82,7 @@ Hold = !(Increment # RelativeAddressing # Absolute # RTS1 # RTS2);
 
 Relative = Increment # RelativeAddressing;
 
-SOffset = [Offset7, Offset7, Offset7, Offset7, Offset7, Offset7...Offset0];
+SOffset = [Offset7, Offset7, Offset7, Offset7, Offset7, Offset7..Offset0];
 
 MuxOut  =  (Increment & ONE) #          
             (Relative & SOffset) #          
