@@ -17,9 +17,9 @@ TITLE           'Program Memory Unit'
 "               Increment               - control input for step
 "               Absolute                - control input for absolute addressing
 "               RTS1                    - control input for updating lower 8 bits of
-"                                         the address 
+"                                         the PC 
 "               RTS2                    - control input for updating upper 5 bits of
-"                                         the address
+"                                         the PC
 "               Reset                   - system reset
 "               Clock                   - system clock
 "
