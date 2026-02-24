@@ -40,8 +40,8 @@ Direct12..Direct0           pin;    "input  13 bits of address or data
 RelativeAddressing          pin;    "input  control signal for relative addressing    
 Increment                   pin;    "input  control signal for incrementing (step)       
 Absolute                    pin;    "input  control signal for direct / absolute address        
-RTS1                        pin;    "input  control signal for updating lower 8 bits of address
-RTS2                        pin;    "input  control signal for updating upper 5 bits of address
+RTS1                        pin;    "input  control signal for updating lower 8 bits of PC
+RTS2                        pin;    "input  control signal for updating upper 5 bits of PC
 Reset			            pin;	"input  system reset
 Clock           	        pin;	"input  system clock
 
