@@ -23,13 +23,8 @@ TITLE      'Program Address Unit Unit Demo'
 
 
 " Revision History:
-" 02/06/18   Olivia Xu  Initial Revision
-" 02/14/18   Glen George  Fixed some typos
-" 02/14/18   Glen George  Specialized for Program Memory Access Unit
-" 01/08/20   Glen George  Updated comments
-" 01/04/21   Glen George  Updated comments
-
-
+" 02/23/26   Olivia Xu  Initial Revision
+" 02/23/26   Olivia Xu  Fixed some typos
 
 " Pin/Signal Declarations
 
@@ -113,7 +108,7 @@ PAUnit.[Direct12..Direct0]  =  [AddrData12..AddrData0];
 PAUnit.Increment = Control0;
 PAUnit.Absolute = Control1;
 PAUnit.RelativeAddressing = Control2; 
-PAUnit.RTS1 = Control3;
+PAUnit.RTS1 = Control3; "lower
 PAUnit.RTS2 = Control4;
 
 PAUnit.Reset  =  Reset;
