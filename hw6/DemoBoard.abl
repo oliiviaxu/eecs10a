@@ -110,11 +110,11 @@ PAUnit.[Direct12..Direct0]  =  [AddrData12..AddrData0];
 " connect each Program Memory Access Unit control signal or bus to a subset of
 "    Control29..Control0
 
-PAUnit.Increment = Control0
-PAUnit.Absolute = Control1
-PAUnit.Relative = Control2
-PAUnit.RTS1 = Control3
-PAUNit.RTS2 = Control4
+PAUnit.Increment = Control0;
+PAUnit.Absolute = Control1;
+PAUnit.RelativeAddressing = Control2;
+PAUnit.RTS1 = Control3;
+PAUNit.RTS2 = Control4;
 
 PAUnit.Reset  =  Reset;
 PAUnit.Clock  =  Clock;
