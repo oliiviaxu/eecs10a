@@ -13,13 +13,13 @@
 ;    11 Feb 26   Olivia Xu        Updated comments / formatting
 
 
-            start:			    ;check if b is zero
+            start:		;check if b is zero
                 LDD   b         ;get the value of b in accumulator
                 CMPI  0         ;check if b is 0
                 JZ    Done      ;if b is now 0, we're done
                 NOP             ;branch slot
 
-            GCDLoop:			;loop, computing GCD
+            GCDLoop:		;loop, computing GCD
                 LDD   a         ;get the value of a in accumulator
                 CMP   b         ;compare the value in accumulator (a) with b
                 JB    Swap      ;if a < b, swap
@@ -30,17 +30,17 @@
                 NOP             ;branch slot
 
             Swap:
-                LDD   a		    ;get a
-                TAX			    ;and put it in X temporarily
-                LDD   b		    ;now get b
-                STD   a		    ;and store it in a
-                TXA			    ;get original a back
-                STD   b		    ;and store it in b
+                LDD   a		;get a
+                TAX		;and put it in X temporarily
+                LDD   b		;now get b
+                STD   a		;and store it in a
+                TXA		;get original a back
+                STD   b		;and store it in b
                 JMP   start     ;jump back to start to repeat
                 NOP             ;branch slot
 
             Done:			    
-                LDD   a			;GCD is a
+                LDD   a		;GCD is a
                 RTS             ;and return
 
 

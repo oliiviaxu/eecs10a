@@ -1,0 +1,100 @@
+MODULE ProgramAccess
+ProgramAccess INTERFACE  (Offset7..Offset0, Direct12..Direct0,
+                          RelativeAddressing, Increment, Absolute, RTS1, RTS2,
+                          Reset, Clock
+                          -> ProgAddr12..ProgAddr0, PC12..PC0);
+
+TITLE  Program Memory Unit
+
+" Description:  This module implements the  
+"
+" Inputs:       Offset[7..0]            - 8 bits of offset or data input (8 bit data bus)
+"               Direct[12..0]           - 13 bits of address input
+"               RelativeAddressing      - control input for relative addresssing
+"               Increment               - control input for step
+"               Absolute                - control input for absolute addressing
+"               RTS1                    - control input for updating lower 8 bits of
+"                                         the address 
+"               RTS2                    - control input for updating upper 5 bits of
+"                                         the address
+"               Reset                   - system reset
+"               Clock                   - system clock
+"
+" Outputs:      ProgAddr[12..0]         - 13 bits of program counter
+"               PC[12..0]               - 
+
+" Revision History:
+" 02/23/26   Olivia Xu  Initial Revision
+" 02/23/26   Olivia Xu  Fixed some typos
+" 02/23/26   Glen George  Specialized for Program Memory Access Unit
+" 02/23/26   Glen George  Updated comments
+" 02/23/26   Glen George  Updated comments
+
+
+" Pin/Signal Declarations
+
+" Inputs 
+
+Offset7..Offset0            pin;        
+Direct12..Direct0           pin;       
+RelativeAddressing          pin;     
+Increment                   pin;           
+Absolute                    pin;            
+RTS1                        pin;
+RTS2                        pin;
+Reset			            pin;	"input  system reset
+Clock           	        pin;	"input  system clock
+
+" Outputs
+
+ProgAddr12..ProgAddr0       pin;
+PC12..PC0                   pin ISTYPE 'REG, KEEP';     " TODO: what is this for
+
+" Constants
+
+ONE   =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ];    " 13-bit value of 1
+
+" Intermediate Terms
+
+Relative                   node;  "Relative signal into the and gate    
+SOffset12..SOffset0        node;  
+MuxOut12..MuxOut0          node; 
+Carry13..Carry0            node;
+Hold                       node;
+
+" Buses
+Offset = [Offset7..Offset0];
+SOffset = [SOffset12..SOffset0];        "Sign extended offset
+Direct = [Direct12..Direct0];
+ProgAddr = [ProgAddr12..ProgAddr0];
+MuxOut = [MuxOut12..MuxOut0];
+Carry = [Carry13..Carry0];              "13 bits of carry for adding
+PC = [PC12..PC0];                   
+
+EQUATIONS
+
+" clocks 
+
+PC.CLK = Clock;
+PC.CLR = Reset;
+
+Hold = !(Increment # RelativeAddressing # Absolute # RTS1 # RTS2);
+
+Relative = Increment # RelativeAddressing;
+
+SOffset = [Offset7, Offset7, Offset7, Offset7, Offset7, Offset7...Offset0];
+
+MuxOut  =  (Increment & ONE) #          
+            (Relative & SOffset) #          
+            (Absolute & Direct) #          
+            (RTS1 & [0, 0, 0, 0, 0, Offset7..Offset0]) # 
+            (RTS2 & [Offset4..Offset0, PC7..PC0]) # 
+            (Hold & 0);
+
+" We are trying to do PC := (Relative & PC) + MuxOut;
+
+Carry0 = 0;
+[Carry13..Carry1] = ((PC & Relative) & MuxOut) # ([Carry12..Carry0] & ((PC & Relative) $ MuxOut)); " PC & Relative are A0, MuxOut is B0 (from HW4)
+PC := (PC & Relative) $ MuxOut $ [Carry12..Carry0];
+
+END ProgramAccess
