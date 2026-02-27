@@ -142,6 +142,7 @@ StatusReg.ACarry7 = ACarry7;
 StatusReg.ShiftCarry = ShiftCarry;
 StatusReg.ControlOp = ControlOp;
 StatusReg.Clock = Clock;
+StatusReg.Reset = Reset;
 
 " Extract the flags from the status register
 Zero = StatusReg.Zero;
