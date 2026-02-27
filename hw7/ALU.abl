@@ -133,7 +133,7 @@ Accumulator.ControlOp = ControlOp;              " control signal from the contro
 ShiftCarry = Accumulator.ShiftCarry;
 
 " Outputs of the accuulator -> input into the status register 
-StatusReg.MuxOut = MuxOut;
+StatusReg.[MuxOut7..MuxOut0] = [MuxOut7..MuxOut0];
 StatusReg.Carry8 = Carry8;
 StatusReg.Carry7 = Carry7;
 StatusReg.Carry4 = Carry4;
