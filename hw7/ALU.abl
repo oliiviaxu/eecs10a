@@ -43,6 +43,7 @@ ADD, ADC, SBB, SUB, CMP, INC, DEC           pin;
 AND, OR, XOR, NOT                           pin;
 TST                                         pin;
 Reset, Clock                                pin;
+CarryIn                                     pin;
 
 " Outputs
 Accum7..Accum0                              pin;
@@ -106,7 +107,7 @@ ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
 
 " Inputs into the Accumulator
 Accumulator.[Data7..Data0] = [Data7..Data0];
-Accumulator.CarryIn = CarryIn;
+Accumulator.CarryFlag = CarryIn;
 Accumulator.LSR = LSR;                          
 Accumulator.ASR = ASR;
 Accumulator.ROR = ROR;
@@ -144,6 +145,6 @@ StatusReg.Clock = Clock;
 Zero = StatusReg.Zero;
 Sign = StatusReg.Sign;
 Overflow = StatusReg.Overflow;
-Carry = StatusReg.Carry;
+CarryOut = StatusReg.Carry;
 
 END ALU
