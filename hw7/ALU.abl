@@ -78,7 +78,7 @@ opB = [1, 0, 1, 0];
 ALUBlocks INTERFACE (Data7..Data0, 
                      LSR, ASR, ROR, RRC, ROL, RLC, ASL,                             " Shift control signals
                      FOp0, FOp1, FOp2, FOp3,                                        " FBlock control signals
-                     ADD, ADC, SBB, SUB, CMP, INC, DEC, TST,                        " Adder control signals
+                     ADD, ADC, SBB, SUB, CMP, INC, DEC,                         " Adder control signals
                      CarryFlag, ControlOp, Clock, Reset                             " Misc control
                      -> Accum7..Accum0, MuxOut7..MuxOut0, ACarry8, ACarry7, ShiftCarry);
 
