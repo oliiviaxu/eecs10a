@@ -1,7 +1,7 @@
 MODULE          ALUBlocks
 INTERFACE       (Data7..Data0,                                           
                 LSR, ASR, ROR, RRC, ROL, RLC, ASL                               " Shift Control Signals
-                FOp0, FOp1, FOp2, FOp3                                          " FBlock Control Signals
+                FOp3..FOp0,                                                     " FBlock Control Signals
                 ADD, ADC, SBB, SUB,                                             " Adder Block Control Signals
                 CMP,                                                            " Control signal for Comparison
                 INC, DEC,                                                        " Control signal for incrementing
@@ -33,10 +33,7 @@ TITLE           'FBlock, Adder, and Shift Block Implementation in ALU'
 "               ROL                             - Control Signal for Rotate Left
 "               RLC                             - Control Signal for Rotate Left through Carry
 "               ASL                             - Control Signal for Arithmetic Shift Left
-"               FOp0                            - Control Signal for FBlock: corresponding to ALUOp0 in the video
-"               FOp1                            - Control Signal for FBlock: corresponding to ALUOp1 in the video
-"               FOp2                            - Control Signal for FBlock: corresponding to ALUOp2 in the video
-"               FOp3                            - Control Signal for FBlock: corresponding to ALUOp3 in the video
+"               FOp3..FOp0                       - Control Signal for FBlock: corresponding to ALUOp0..3 in the video
 "               ADD                              
 "               ADC        
 "               TST                     
@@ -67,10 +64,7 @@ RRC                                 pin;    "input  control signal for rotate ri
 ROL                                 pin;    "input  control signal for rotate left
 RLC                                 pin;    "input  control signal for rotate left through carry
 ASL                                 pin;    "input  control signal for arithmetic shift left
-FOp0                                pin;    "input  control signal for FBlock: corresponding to ALUOp0 in the video
-FOp1                                pin;    "input  control signal for FBlock: corresponding to ALUOp1 in the video
-FOp2                                pin;    "input  control signal for FBlock: corresponding to ALUOp2 in the video
-FOp3                                pin;    "input  control signal for FBlock: corresponding to ALUOp3 in the video
+FOp3..FOp0                          pin;    "input  control signal for FBlock: corresponding to ALUOp0 in the video
 ADD                                 pin;
 ADC                                 pin;
 SUB                                 pin;
@@ -107,6 +101,7 @@ B = [B7..B0];                                               " The other inputs i
 AdderOutput = [AdderOutput7..AdderOutput0];                 " Output of the adder block that goes into 2:1 mux and Flag calc.
 ACarry = [ACarry8..ACarry0];                                   " 9 bits of carry used in the adder block
 MuxOut = [MuxOut7..MuxOut0];                                " Output of 2:1 mux of the ALU 
+FOp = [FOp3..FOp0];                                         
 
 
 EQUATIONS

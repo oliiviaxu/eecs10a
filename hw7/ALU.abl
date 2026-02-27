@@ -77,7 +77,7 @@ opB = [1, 0, 1, 0];
 " StatusRegister and ALUBlocks modules
 ALUBlocks INTERFACE (Data7..Data0,                                           
                 LSR, ASR, ROR, RRC, ROL, RLC, ASL                               " Shift Control Signals
-                FOp0, FOp1, FOp2, FOp3                                          " FBlock Control Signals
+                FOp3..FOp0,                                          " FBlock Control Signals
                 ADD, ADC, SBB, SUB,                                             " Adder Block Control Signals
                 CMP,                                                            " Control signal for Comparison
                 INC, DEC,                                                        " Control signal for incrementing
