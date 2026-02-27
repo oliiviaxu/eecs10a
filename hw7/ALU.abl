@@ -75,13 +75,20 @@ notB = [0, 1, 0, 1];
 opB = [1, 0, 1, 0];
 
 " StatusRegister and ALUBlocks modules
-ALUBlocks INTERFACE (Data7..Data0, 
-                     LSR, ASR, ROR, RRC, ROL, RLC, ASL,                             " Shift control signals
-                     FOp0, FOp1, FOp2, FOp3,                                        " FBlock control signals
-                     ADD, ADC, SBB, SUB, CMP, INC, DEC,                         " Adder control signals
-                     TST,
-                     CarryFlag, ControlOp, Clock, Reset                             " Misc control
-                     -> Accum7..Accum0, MuxOut7..MuxOut0, ACarry8, ACarry7, ShiftCarry);
+ALUBlocks INTERFACE (Data7..Data0,                                           
+                LSR, ASR, ROR, RRC, ROL, RLC, ASL                               " Shift Control Signals
+                FOp0, FOp1, FOp2, FOp3                                          " FBlock Control Signals
+                ADD, ADC, SBB, SUB,                                             " Adder Block Control Signals
+                CMP,                                                            " Control signal for Comparison
+                INC, DEC,                                                        " Control signal for incrementing
+                TST,
+                ControlOp,                                                       " ControlOp signal from Control Unit into 2:1 mux 
+                CarryFlag,                                 
+                Clock, Reset                                                            
+                -> Accum7..Accum0,                                              " The main registered data output
+                   MuxOut7..MuxOut0,                                            " ALU Result for Flag Computation
+                   ACarry8, ACarry7,                               " Adder Flags for Flag Computation          
+                   ShiftCarry);
 
 StatusRegister INTERFACE (MuxOut7..MuxOut0, ACarry8, ACarry7, ShiftCarry, 
                           ControlOp, Clock, Reset 
