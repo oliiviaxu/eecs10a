@@ -129,7 +129,7 @@ Accumulator.ControlOp = ControlOp;              " control signal from the contro
 
 " Extract outputs of the accumulator
 [Accum7..Accum0] = Accumulator.[Accum7..Accum0];
-MuxOut = Accumulator.MuxOut;
+[MuxOut7..MuxOut0] = Accumulator.[MuxOut7..MuxOut0];
 ShiftCarry = Accumulator.ShiftCarry;
 
 " Outputs of the accuulator -> input into the status register 
