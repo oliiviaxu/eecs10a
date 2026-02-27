@@ -89,9 +89,8 @@ ALU INTERFACE  (Data7..Data0,
                 LSR, ASR, ROR, RRC, ROL, RLC, ASL,                              
                 ADD, ADC, SBB, SUB, CMP, INC, DEC,                              
                 AND, OR, XOR, NOT, TST,                                         
-                CarryIn,
                 Reset, Clock
-                -> Accum7..Accum0, Zero, Sign, Overflow, CarryOut);
+                -> Accum7..Accum0, Zero, Sign, Overflow, CarryFlag);
 
 " create an instance of the unit to be tested  
 
@@ -132,7 +131,6 @@ ALUnit.RRC = Control15;
 ALUnit.ROL = Control16;
 ALUnit.RLC = Control17;
 ALUnit.ASL = Control18;
-ALUnit.CarryIn = Flags3;
 
 " ALU Outputs
 
@@ -140,11 +138,11 @@ ALUnit.CarryIn = Flags3;
 Flags0 = ALUnit.Zero;
 Flags1 = ALUnit.Sign;
 Flags2 = ALUnit.Overflow;
-Flags3 = ALUnit.CarryOut;
+Flags3 = ALUnit.CarryFlag;
+Flags7..Flags4 = 0;           
 
 AccumAddr[12..8] = 0;
 XReg = 0;
 SReg = 0;
-
 
 END  ALUDemo

@@ -3,9 +3,8 @@ INTERFACE  (Data7..Data0,
             LSR, ASR, ROR, RRC, ROL, RLC, ASL,                              " Shift Control Signals
             ADD, ADC, SBB, SUB, CMP, INC, DEC,                              " Adder Block Control Signals
             AND, OR, XOR, NOT, TST,                                         " FBlock and TST Control Signals
-            CarryIn,
             Reset, Clock
-            -> Accum7..Accum0, Zero, Sign, Overflow, CarryOut);             " Main Outputs
+            -> Accum7..Accum0, Zero, Sign, Overflow, CarryFlag);             " Main Outputs
 
 TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as well as the status register to form the ALU'
 
@@ -21,12 +20,11 @@ TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as 
 "               Data7..Data0                                   - 8 bits of Operand B
 "               LSR, ASR, ROR, RRC, ROL, RLC, ASL              - Control signals for shifts 
 "               ADD, ADC, SBB, SUB, CMP, INC, DEC              - Adder Control Signals
-"               AND, OR, XOR, NOT, TST                         - FBlock Control Signals
-"               CarryIn                                        
+"               AND, OR, XOR, NOT, TST                         - FBlock Control Signals                                        
 "               Reset, Clock                                
 "
 " Outputs:      Accum[7..0]                     - 8 bits of accumulator
-"               Zero, Sign, Overflow, CarryOut  - ALU Status Flags                             
+"               Zero, Sign, Overflow, CarryFlag  - ALU Status Flags                             
 "
 " Revision History:
 " 02/26/26   Olivia Xu  Initial Revision
@@ -40,14 +38,12 @@ TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as 
 Data7..Data0                                pin;    
 RRC, ROL, RLC, ASL, LSR, ASR, ROR           pin;    
 ADD, ADC, SBB, SUB, CMP, INC, DEC           pin;
-AND, OR, XOR, NOT                           pin;
-TST                                         pin;
+AND, OR, XOR, NOT, TST                      pin;
 Reset, Clock                                pin;
-CarryIn                                     pin;
 
 " Outputs
 Accum7..Accum0                              pin;
-Zero, Sign, Overflow, CarryOut              pin;
+Zero, Sign, Overflow, CarryFlag              pin;
 
 " Intermediate Terms
 
@@ -116,7 +112,7 @@ ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
 
 " Inputs into the Accumulator
 Accumulator.[Data7..Data0] = [Data7..Data0];
-Accumulator.CarryFlag = CarryIn;
+Accumulator.CarryFlag = CarryFlag;
 Accumulator.LSR = LSR;                          
 Accumulator.ASR = ASR;
 Accumulator.ROR = ROR;
@@ -156,6 +152,6 @@ StatusReg.Reset = Reset;
 Zero = StatusReg.Zero;
 Sign = StatusReg.Sign;
 Overflow = StatusReg.Overflow;
-CarryOut = StatusReg.Carry;
+CarryFlag = StatusReg.Carry;                            " TODO: do i change this? 
 
 END ALU
