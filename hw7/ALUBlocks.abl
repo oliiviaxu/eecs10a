@@ -93,7 +93,6 @@ B7..B0                                     node;  " One of the inputs into the a
 AdderOutput7..AdderOutput0                 node;  " Output of the adder block that goes into 2:1 mux and Flag calc. 
 ShiftOutput7..ShiftOutput0                 node;  " Output of the shift block that goes into 2:1 mux and Flag calc.
 F7..F0                                     node;  " Output of the FBlock that goes into the adder block
-MuxOut7..MuxOut0                           node;  " Output of the 2:1 mux of the ALU 
 
 " Buses
 Data = [Data7..Data0];                                      " 8 bits of operand B 
@@ -102,7 +101,7 @@ F = [F7..F0];                                               " Output of the FBlo
 A = [A7..A0];                                               " One of the inputs into the adder block 
 B = [B7..B0];                                               " The other inputs into the adder block from the FBlock 
 AdderOutput = [AdderOutput7..AdderOutput0];                 " Output of the adder block that goes into 2:1 mux and Flag calc.
-ACarry = [Carry8..Carry0];                                   " 9 bits of carry used in the adder block
+ACarry = [ACarry8..ACarry0];                                   " 9 bits of carry used in the adder block
 MuxOut = [MuxOut7..MuxOut0];                                " Output of 2:1 mux of the ALU 
 
 
