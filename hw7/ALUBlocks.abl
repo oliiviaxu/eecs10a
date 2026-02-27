@@ -95,7 +95,8 @@ ShiftOutput7..ShiftOutput0                 node;  " Output of the shift block th
 F7..F0                                     node;  " Output of the FBlock that goes into the adder block
 
 " Buses
-Data = [Data7..Data0];                                      " 8 bits of operand B 
+Data = [Data7..Data0];                                      " 8 bits of operand B
+Accum = [Accum7..Accum0];                                    
 ShiftOutput = [ShiftOutput7..ShiftOutput0];                 " Output of the shift block that goes into 2:1 mux and Flag calc.
 F = [F7..F0];                                               " Output of the FBlock that goes into the adder block 
 A = [A7..A0];                                               " One of the inputs into the adder block 
@@ -107,7 +108,7 @@ MuxOut = [MuxOut7..MuxOut0];                                " Output of 2:1 mux 
 
 EQUATIONS
 
-Accum.clk = Clock;
+Accum.CLK = Clock;
 
 " Shift Equations 
 
