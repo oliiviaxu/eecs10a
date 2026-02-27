@@ -89,10 +89,11 @@ ALU INTERFACE  (Data7..Data0,
                 LSR, ASR, ROR, RRC, ROL, RLC, ASL,                              
                 ADD, ADC, SBB, SUB, CMP, INC, DEC,                              
                 AND, OR, XOR, NOT, TST,                                         
+                CarryIn,
                 Reset, Clock
-                -> Accum7..Accum0, Zero, Sign, Overflow, Carry);
+                -> Accum7..Accum0, Zero, Sign, Overflow, CarryOut);
 
-" create an instance of the unit to be tested
+" create an instance of the unit to be tested  
 
 ALUnit    FUNCTIONAL_BLOCK  ALU;
 
@@ -131,6 +132,7 @@ ALUnit.RRC = Control15;
 ALUnit.ROL = Control16;
 ALUnit.RLC = Control17;
 ALUnit.ASL = Control18;
+ALUnit.CarryFlag = CarryIn;
 
 " ALU Outputs
 

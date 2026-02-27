@@ -3,8 +3,9 @@ INTERFACE  (Data7..Data0,
             LSR, ASR, ROR, RRC, ROL, RLC, ASL,                              " Shift Control Signals
             ADD, ADC, SBB, SUB, CMP, INC, DEC,                              " Adder Block Control Signals
             AND, OR, XOR, NOT, TST,                                         " FBlock and TST Control Signals
+            CarryIn,
             Reset, Clock
-            -> Accum7..Accum0, Zero, Sign, Overflow, Carry);             " Main Outputs
+            -> Accum7..Accum0, Zero, Sign, Overflow, CarryOut);             " Main Outputs
 
 TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as well as the status register to form the ALU'
 
@@ -21,10 +22,11 @@ TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as 
 "               LSR, ASR, ROR, RRC, ROL, RLC, ASL              - Control signals for shifts 
 "               ADD, ADC, SBB, SUB, CMP, INC, DEC              - Adder Control Signals
 "               AND, OR, XOR, NOT, TST                         - FBlock Control Signals
+"               CarryIn                                        
 "               Reset, Clock                                
 "
 " Outputs:      Accum[7..0]                     - 8 bits of accumulator
-"               Zero, Sign, Overflow, Carry  - ALU Status Flags                             
+"               Zero, Sign, Overflow, CarryOut  - ALU Status Flags                             
 "
 " Revision History:
 " 02/26/26   Olivia Xu  Initial Revision
@@ -44,19 +46,19 @@ Reset, Clock                                pin;
 
 " Outputs
 Accum7..Accum0                              pin;
-Zero, Sign, Overflow, Carry              pin;
+Zero, Sign, Overflow, CarryOut              pin;
 
 " Intermediate Terms
 
 MuxOut7..MuxOut0                      node;
-Carry8..Carry0                              node;
+ACarry8..ACarry0                              node;
 ShiftCarry                                  node;
 ControlOp                               node;
 
 " Buses
 Data = [Data7..Data0];                                  
 MuxOut = [MuxOut7..MuxOut0];
-Carry = [Carry8..Carry0];
+ACarry = [ACarry8..ACarry0];
 
 " Constants 
 
@@ -75,7 +77,7 @@ ALUBlocks INTERFACE (Data7..Data0,
                      LSR, ASR, ROR, RRC, ROL, RLC, ASL,                             " Shift control signals
                      FOp0, FOp1, FOp2, FOp3,                                        " FBlock control signals
                      ADD, ADC, SBB, SUB, CMP, INC, DEC, TST,                        " Adder control signals
-                     CarryFlag, ControlOp, Clock, Reset                             " Misc control
+                     CarryIn, ControlOp, Clock, Reset                             " Misc control
                      -> Accum7..Accum0, MuxOut7..MuxOut0, Carry8..Carry0, ShiftCarry);
 
 StatusRegister INTERFACE (MuxOut7..MuxOut0, ACarry8, ACarry7, ShiftCarry, 
@@ -104,7 +106,7 @@ ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
 
 " Inputs into the Accumulator
 Accumulator.[Data7..Data0] = [Data7..Data0];
-Accumulator.CarryFlag = Carry;
+Accumulator.CarryIn = CarryIn;
 Accumulator.LSR = LSR;                          
 Accumulator.ASR = ASR;
 Accumulator.ROR = ROR;
