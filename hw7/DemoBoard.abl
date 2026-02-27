@@ -132,7 +132,7 @@ ALUnit.RRC = Control15;
 ALUnit.ROL = Control16;
 ALUnit.RLC = Control17;
 ALUnit.ASL = Control18;
-ALUnit.CarryFlag = CarryIn;
+ALUnit.CarryIn = Flags3;
 
 " ALU Outputs
 
