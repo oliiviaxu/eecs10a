@@ -1,0 +1,147 @@
+MODULE      ALU 
+INTERFACE  (Data7..Data0,
+            LSR, ASR, ROR, RRC, ROL, RLC, ASL,                              " Shift Control Signals
+            ADD, ADC, SBB, SUB, CMP, INC, DEC,                              " Adder Block Control Signals
+            AND, OR, XOR, NOT, TST,                                         " FBlock and TST Control Signals
+            Reset, Clock
+            -> Accum7..Accum0, Zero, Sign, Overflow, Carry);             " Main Outputs
+
+TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as well as the status register to form the ALU'
+
+" Description:   Wrapper module for the ALU. 
+"                This module connects the ALUBlocks with the 
+"                Status Register. It decodes the signals 
+"                (ADD, SUB, AND, LSR, etc) into the appropriate FBlock control 
+"                signals (FOp) and routes the data, carries, and 
+"                control signals between the blocks to produce the 
+"                final Accumulator value and Status Flags.
+"
+" Inputs:       
+"               Data7..Data0                                   - 8 bits of Operand B
+"               LSR, ASR, ROR, RRC, ROL, RLC, ASL              - Control signals for shifts 
+"               ADD, ADC, SBB, SUB, CMP, INC, DEC              - Adder Control Signals
+"               AND, OR, XOR, NOT, TST                         - FBlock Control Signals
+"               Reset, Clock                                
+"
+" Outputs:      Accum[7..0]                     - 8 bits of accumulator
+"               Zero, Sign, Overflow, Carry  - ALU Status Flags                             
+"
+" Revision History:
+" 02/26/26   Olivia Xu  Initial Revision
+" TODO 
+
+" Pin/Signal Declarations
+
+" TODO: write comments 
+
+" Inputs 
+Data7..Data0                                pin;    
+RRC, ROL, RLC, ASL, LSR, ASR, ROR           pin;    
+ADD, ADC, SBB, SUB, CMP, INC, DEC           pin;
+AND, OR, XOR, NOT                           pin;
+TST                                         pin;
+Reset, Clock                                pin;
+
+" Outputs
+Accum7..Accum0                              pin;
+Zero, Sign, Overflow, Carry              pin;
+
+" Intermediate Terms
+
+MuxOut7..MuxOut0                      node;
+Carry8..Carry0                              node;
+ShiftCarry                                  node;
+ControlOp                               node;
+
+" Buses
+Data = [Data7..Data0];                                  
+MuxOut = [MuxOut7..MuxOut0];
+Carry = [Carry8..Carry0];
+
+" Constants 
+
+" we have this from the truth table from the video 
+" we only care about AND, NOT, OR, XOR
+
+AandB = [1, 0, 0, 0];
+AorB = [1, 1, 1, 0];
+AxorB = [0, 1, 1, 0];
+notA = [0, 0, 1, 1];
+notB = [0, 1, 0, 1];
+opB = [1, 0, 1, 0];
+
+" StatusRegister and ALUBlocks modules
+ALUBlocks INTERFACE (Data7..Data0, 
+                     LSR, ASR, ROR, RRC, ROL, RLC, ASL,                             " Shift control signals
+                     FOp0, FOp1, FOp2, FOp3,                                        " FBlock control signals
+                     ADD, ADC, SBB, SUB, CMP, INC, DEC, TST,                        " Adder control signals
+                     CarryFlag, ControlOp, Clock, Reset                             " Misc control
+                     -> Accum7..Accum0, MuxOut7..MuxOut0, Carry8..Carry0, ShiftCarry);
+
+StatusRegister INTERFACE (MuxOut7..MuxOut0, ACarry8, ACarry7, ShiftCarry, 
+                          ControlOp, Clock, Reset 
+                          -> Sign, Carry, Zero, Overflow);
+
+
+Accumulator     FUNCTIONAL_BLOCK    ALUBlocks;
+StatusReg  FUNCTIONAL_BLOCK    StatusRegister;
+
+EQUATIONS
+
+" FBlock Control Signal Generation
+
+Accumulator.[FOp3..FOp0] = (AorB & OR) # 
+                           (notA & NOT) #
+                           (AandB & (AND # TST)) # 
+                           (AxorB & XOR) #
+                           (opB & (ADD # ADC)) # 
+                           (notB & (SUB # SBB # CMP)) # 
+                           (0 & INC) # 
+                           (1 & DEC);  
+
+" Generate ControlOp (1 for Adder, 0 for Shifts)
+ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
+
+" Inputs into the Accumulator
+Accumulator.[Data7..Data0] = [Data7..Data0];
+Accumulator.CarryFlag = Carry;
+Accumulator.LSR = LSR;                          
+Accumulator.ASR = ASR;
+Accumulator.ROR = ROR;
+Accumulator.RRC = RRC;
+Accumulator.ROL = ROL;
+Accumulator.RLC = RLC;
+Accumulator.ASL = ASL;
+Accumulator.ADD = ADD;
+Accumulator.ADC = ADC;
+Accumulator.SUB = SUB;
+Accumulator.SBB = SBB;
+Accumulator.CMP = CMP;
+Accumulator.INC = INC;
+Accumulator.DEC = DEC;
+Accumulator.TST = TST;                  
+Accumulator.Reset = Reset;              
+Accumulator.Clock = Clock;
+Accumulator.ControlOp = ControlOp;              " control signal from the control unit into the 2:1 mux 
+
+" Extract outputs of the accumulator
+[Accum7..Accum0] = Accumulator.[Accum7..Accum0];
+MuxOut = Accumulator.MuxOut;
+ShiftCarry = Accumulator.ShiftCarry;
+
+" Outputs of the accuulator -> input into the status register 
+StatusReg.MuxOut = MuxOut;
+StatusReg.Carry8 = Carry8;
+StatusReg.Carry7 = Carry7;
+StatusReg.Carry4 = Carry4;
+StatusReg.ShiftCarry = ShiftCarry;
+StatusReg.ControlOp = ControlOp;
+StatusReg.Clock = Clock;
+
+" Extract the flags from the status register
+Zero = StatusReg.Zero;
+Sign = StatusReg.Sign;
+Overflow = StatusReg.Overflow;
+Carry = StatusReg.Carry;
+
+END ALU

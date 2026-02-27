@@ -1,0 +1,170 @@
+MODULE          ALUBlocks
+INTERFACE       (Data7..Data0,                                           
+                LSR, ASR, ROR, RRC, ROL, RLC, ASL                               " Shift Control Signals
+                FOp0, FOp1, FOp2, FOp3                                          " FBlock Control Signals
+                ADD, ADC, SBB, SUB,                                             " Adder Block Control Signals
+                CMP,                                                            " Control signal for Comparison
+                INC, DEC                                                        " Control signal for incrementing
+                ControlOp                                                       " ControlOp signal from Control Unit into 2:1 mux 
+                CarryFlag,                                 
+                Clock, Reset                                                            
+                -> Accum7..Accum0,                                              " The main registered data output
+                   MuxOut7..MuxOut0,                                            " ALU Result for Flag Computation
+                   ACarry8, ACarry7,                               " Adder Flags for Flag Computation          
+                   ShiftCarry);
+
+TITLE           'FBlock, Adder, and Shift Block Implementation in ALU'
+
+" Description:   This module performs all adding, FBlock, and shift/rotate 
+"                operations. It has 3 main stages:
+"                  1. A Shift/Rotate block 
+"                  2. An FBlock
+"                  3. An 8-bit Adder 
+"                It outputs the final ALU result and the 
+"                carry signals (both adder and shift) to the Status Register for flag calculation.
+"
+" Inputs:       
+"               Data7..Data0                    - 8 bits of Operand B
+"               LSR                             - Control Signal for Logical Shift Right
+"               ASR                             - Control Signal for Arithmetic Shift Right
+"               ROR                             - Control Signal for Rotate Right
+"               RRC                             - Control Signal for Rotate Right through Carry
+"               ROL                             - Control Signal for Rotate Left
+"               RLC                             - Control Signal for Rotate Left through Carry
+"               ASL                             - Control Signal for Arithmetic Shift Left
+"               FOp0                            - Control Signal for FBlock: corresponding to ALUOp0 in the video
+"               FOp1                            - Control Signal for FBlock: corresponding to ALUOp1 in the video
+"               FOp2                            - Control Signal for FBlock: corresponding to ALUOp2 in the video
+"               FOp3                            - Control Signal for FBlock: corresponding to ALUOp3 in the video
+"               ADD                              
+"               ADC                             
+"               SUB                              
+"               CMP                             
+"               SBB                             
+"               INC                             
+"               CarryFlag                       - Carry or borrow flag input 
+"
+" Outputs:      Accum[7..0]                      - 8 bits of accumulator
+"               MuxOut7..MuxOut0,                - ALU Result for Flag Computation
+"               ACarry8..ACarry0,                  - Adder Flags for Flag Computation 
+"               ShiftCarry                       - Shifter Flags for Flag Computation
+"
+" Revision History:
+" 02/26/26   Olivia Xu  Initial Revision
+" TODO
+
+" Pin/Signal Declarations
+
+" Inputs 
+
+Data7..Data0                pin;    "input  8 bits of operand B in the ALU
+LSR                                 pin;    "input  control signal for logical shift right 
+ASR                                 pin;    "input  control signal for arithmetic shift right
+ROR                                 pin;    "input  control signal for rotate right
+RRC                                 pin;    "input  control signal for rotate right through carry
+ROL                                 pin;    "input  control signal for rotate left
+RLC                                 pin;    "input  control signal for rotate left through carry
+ASL                                 pin;    "input  control signal for arithmetic shift left
+FOp0                                pin;    "input  control signal for FBlock: corresponding to ALUOp0 in the video
+FOp1                                pin;    "input  control signal for FBlock: corresponding to ALUOp1 in the video
+FOp2                                pin;    "input  control signal for FBlock: corresponding to ALUOp2 in the video
+FOp3                                pin;    "input  control signal for FBlock: corresponding to ALUOp3 in the video
+ADD                                 pin;
+ADC                                 pin;
+SUB                                 pin;
+CMP                                 pin;
+SBB                                 pin;
+INC                                 pin;
+DEC                                 pin;
+CarryFlag                           pin;
+ControlOp                           pin;
+Clock                               pin;
+Reset                               pin;
+
+" Outputs
+Accum7..Accum0                      pin ISTYPE 'REG, KEEP';    "output  8 bits of accumulator
+MuxOut7..MuxOut0                                       pin;                    
+ACarry8..ACarry0                                         pin;
+ShiftCarry                                             pin;
+
+" Intermediate Terms
+A7..A0                                     node;  " One of the inputs into the adder that results from ANDing Operand A and AOp0
+B7..B0                                     node;  " One of the inputs into the adder (from the FBlock)
+AdderOutput7..AdderOutput0                 node;  " Output of the adder block that goes into 2:1 mux and Flag calc. 
+ShiftOutput7..ShiftOutput0                 node;  " Output of the shift block that goes into 2:1 mux and Flag calc.
+F7..F0                                     node;  " Output of the FBlock that goes into the adder block
+MuxOut7..MuxOut0                           node;  " Output of the 2:1 mux of the ALU 
+
+" Buses
+Data = [Data7..Data0];                                      " 8 bits of operand B 
+ShiftOutput = [ShiftOutput7..ShiftOutput0];                 " Output of the shift block that goes into 2:1 mux and Flag calc.
+F = [F7..F0];                                               " Output of the FBlock that goes into the adder block 
+A = [A7..A0];                                               " One of the inputs into the adder block 
+B = [B7..B0];                                               " The other inputs into the adder block from the FBlock 
+AdderOutput = [AdderOutput7..AdderOutput0];                 " Output of the adder block that goes into 2:1 mux and Flag calc.
+ACarry = [Carry8..Carry0];                                   " 9 bits of carry used in the adder block
+MuxOut = [MuxOut7..MuxOut0];                                " Output of 2:1 mux of the ALU 
+
+
+EQUATIONS
+
+Accum.clk = Clock;
+
+" Shift Equations 
+
+" Handling R_i
+
+[ShiftOutput6..ShiftOutput1]  =  ((LSR # ASR # ROR # RRC) & [Accum7..Accum2]) #                  " Following the video
+                                 ((ROL # RLC # ASL) & [Accum5..Accum0]);             
+
+" Handling the low bit (R_0)
+
+ShiftOutput0  =  (Accum7 & ROL) #                                   " A_0 -> A_n_1 
+                 (0 & ASL) #                                           " A_0 -> 0     
+                 (Accum1 & (LSR # ASR # ROR # RRC)) #               " A_0 -> A_1   
+                 (CarryFlag & RLC);                                        " A_0 -> C
+
+" Handling the high bit (R_n - 1)
+
+ShiftOutput7  =  (Accum6 & (ROL # RLC # ASL)) #                     " A_n-1 -> A_n-2
+                (Accum7 & ASR) #                                    " A_n-1 -> A_n-1
+                (Accum0 & ROR) #                                    " A_n-1 -> A_0
+                (0 & LSR) #                                         " A_n-1 -> 0
+                (CarryFlag & RRC);                                  " A_n-1 -> C
+
+ShiftCarry = ((LSR # ASR # ROR # RRC) & Accum0) #                   " When we shift right, save LSB
+             ((ASL # ROL # RLC) & Accum7);                          " When we shift left, save MSB
+
+" FBlock Equations 
+" FOp0-3 are control signals
+
+F  =  (FOp0 & !Accum & !Data) #               " AB = 00 -> Op1
+      (FOp1 & !Accum & Data) #                " AB = 01 -> Op2
+      (FOp2 & Accum & !Data) #                " AB = 10 -> Op3
+      (FOp3 & Accum & Data);                  " AB = 11 -> Op4
+
+
+" Adder Equations
+
+A = (ADD # ADC # SUB # SBB # CMP # INC # DEC) & Accum;            " We want to pass accum into the adder whenever doing math or a comparison
+B = F;                                                            " When we are adding, second input into the adder is the output of the FBlock
+
+" Performing the addition below
+
+ACarry0 = SUB # INC # (ADC & CarryFlag) # (SBB & !CarryFlag);   " Add inverted previous carry for SBB, add previous carry for ADC
+
+[ACarry8..ACarry1] = (A & B) # ([ACarry7..ACarry0] & (A $ B));          " AdderInput and Data correspond to A0 and B0 in HW4
+AdderOutput = A $ B $ [ACarry7..ACarry0];                                             " 8-bit vector / bus
+
+" Implementation of 2:1 mux to select one of the outputs (AdderOutput or ShiftOutput) 
+
+MuxOut = (AdderOutput & ControlOp) #                 " ControlOp = 1 -> AdderOutput
+         (ShiftOutput & !ControlOp);                 " ControlOp = 0 -> ShiftOutput
+
+" If doing comparison, set accumulator accordingly 
+" If CMP = 1, compare with accumulator 
+" If CMP = 0, Accum = MuxOut 
+
+Accum := (CMP & Accum) # (!CMP & MuxOut);
+
+END ALUBlocks

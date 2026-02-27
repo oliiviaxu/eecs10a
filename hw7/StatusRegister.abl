@@ -1,0 +1,83 @@
+MODULE          StatusRegister
+INTERFACE       (MuxOut7..MuxOut0, 
+                 ACarry8, 
+                 ACarry7,
+                 ShiftCarry,
+                 ControlOp,                     " If we are doing adder (1) or a shift (0)
+                 Clock, Reset                     
+                -> Sign, Carry, Zero, Overflow);
+
+TITLE           'Status Register'
+
+" Description:   Computes the flags (Zero, Sign, Overflow, Carry). 
+"                Updates on every clock cycle based on the 
+"                ALU's outputs (MuxOut and Carry/ShiftCarry).
+"
+" Inputs:        MuxOut7..MuxOut0               - The 8-bit result from the 2:1 mux
+"                ACarry8                        - 
+"                ACarry7                        - 
+"                ShiftCarry                     - 
+"                ControlOp                      - 1 = Adding, 0 = Shift 
+"                Clock                          
+"                Reset 
+"
+" Outputs:       Sign                           - 1 if the ALU result is negative
+"                Carry                          - The carry out from adder, or the bit shifted out
+"                Zero                           - 1 if all bits of the ALU result are 0
+"                Overflow                       - 1 if two's complement overflowed
+"
+" Revision History:
+" 02/26/26   Olivia Xu  Initial Revision
+" 02/26/26   Olivia Xu  Fixed some typos
+
+" Pin/Signal Declarations
+
+" Inputs 
+MuxOut7..MuxOut0                        pin;
+ACarry8                                 pin;
+ACarry7                                 pin;
+ShiftCarry                              pin;
+ControlOp                               pin;
+Clock                                   pin;
+Reset                                   pin;
+
+" Outputs (Must be registers!)
+Sign                        pin ISTYPE 'REG';
+Carry                       pin ISTYPE 'REG';
+Zero                        pin ISTYPE 'REG';
+Overflow                    pin ISTYPE 'REG';
+
+" Intermediate Terms (Combinational calculations before saving)
+Z                      node;
+N                      node;
+V                      node;
+C                      node;
+
+EQUATIONS
+
+" 1. Wire the master clock to all four flip-flops
+Sign.CLK     = Clock;
+Carry.CLK    = Clock;
+Zero.CLK     = Clock;
+Overflow.CLK = Clock;
+Sign.CLR = !Reset;
+Carry.CLR = !Reset;
+Zero.CLR = !Reset;
+Overflow.CLR = !Reset;
+
+" 2. Compute the raw flags combinatorially
+Z = !(MuxOut7 # MuxOut6 # MuxOut5 # MuxOut4 # MuxOut3 # MuxOut2 # MuxOut1 # MuxOut0); 
+N = MuxOut7;
+V = ACarry8 $ ACarry7;
+
+" If ControlOp is 1 (Adder), pass ACarry8. 
+" If ControlOp is 0 (Shift), pass ShiftCarry.
+C = (ACarry8 & ControlOp) # (ShiftCarry & !ControlOp);
+
+" 3. Save the calculated values into the registers on the clock edge
+Zero     := Z;
+Sign     := N;
+Overflow := V;
+Carry    := C;
+
+END StatusRegister
