@@ -4,8 +4,9 @@ INTERFACE       (Data7..Data0,
                 FOp0, FOp1, FOp2, FOp3                                          " FBlock Control Signals
                 ADD, ADC, SBB, SUB,                                             " Adder Block Control Signals
                 CMP,                                                            " Control signal for Comparison
-                INC, DEC                                                        " Control signal for incrementing
-                ControlOp                                                       " ControlOp signal from Control Unit into 2:1 mux 
+                INC, DEC,                                                        " Control signal for incrementing
+                TST,
+                ControlOp,                                                       " ControlOp signal from Control Unit into 2:1 mux 
                 CarryFlag,                                 
                 Clock, Reset                                                            
                 -> Accum7..Accum0,                                              " The main registered data output
@@ -37,7 +38,8 @@ TITLE           'FBlock, Adder, and Shift Block Implementation in ALU'
 "               FOp2                            - Control Signal for FBlock: corresponding to ALUOp2 in the video
 "               FOp3                            - Control Signal for FBlock: corresponding to ALUOp3 in the video
 "               ADD                              
-"               ADC                             
+"               ADC        
+"               TST                     
 "               SUB                              
 "               CMP                             
 "               SBB                             
@@ -76,6 +78,7 @@ CMP                                 pin;
 SBB                                 pin;
 INC                                 pin;
 DEC                                 pin;
+TST                                 pin;
 CarryFlag                           pin;
 ControlOp                           pin;
 Clock                               pin;
@@ -165,6 +168,6 @@ MuxOut = (AdderOutput & ControlOp) #                 " ControlOp = 1 -> AdderOut
 " If CMP = 1, compare with accumulator 
 " If CMP = 0, Accum = MuxOut 
 
-Accum := (CMP & Accum) # (!CMP & MuxOut);
+Accum := ((CMP # TST) & Accum) # (!(CMP # TST) & MuxOut);
 
 END ALUBlocks
