@@ -116,7 +116,7 @@ FOp = [FOp3..FOp0];
 EQUATIONS
 
 Accum.CLK = Clock;
-Accum.CLR = !Reset;
+Accum.CLR = Reset;
 
 " Shift Equations 
 
