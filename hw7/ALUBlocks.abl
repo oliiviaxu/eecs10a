@@ -163,7 +163,6 @@ AdderCarry0 = (0 & (ADD # DEC)) #
               (1 & (SUB # INC # CMP)) #
               (!CarryFlag & ADC) #
               (CarryFlag & SBB);
-AdderCarry0 = SUB # CMP # INC # (ADC & CarryFlag) # (SBB & !CarryFlag);   " TODO: do I need CMP here, Add inverted previous carry for SBB, add previous carry for ADC
 
 [AdderCarry8..AdderCarry1] = (A & B) # ([AdderCarry7..AdderCarry0] & (A $ B));          " AdderInput and Data correspond to A0 and B0 in HW4
 AdderOutput = A $ B $ [AdderCarry7..AdderCarry0];                                             " 8-bit vector / bus
