@@ -109,6 +109,7 @@ ALUnit.[Data7..Data0]  =  [DataOff7..DataOff0];
 ALUnit.Reset  =  Reset;
 ALUnit.Clock  =  Clock;
 
+" One-hot encoding for the instructions
 ALUnit.ADD = Control0;
 ALUnit.ADC = Control1;
 ALUnit.SUB = Control2;
@@ -127,7 +128,7 @@ ALUnit.ROR = Control14;
 ALUnit.RRC = Control15;
 ALUnit.ROL = Control16;
 ALUnit.RLC = Control17;
-ALUnit.ASL = Control18;
+ALUnit.ASL = Control18;                             " This is same as LSL
 ALUnit.LOAD = Control19;
 ALUnit.POP = Control20;
 

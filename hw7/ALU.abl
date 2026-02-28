@@ -1,8 +1,8 @@
 MODULE      ALU 
 INTERFACE  (Data7..Data0,
-            LSR, ASR, ROR, RRC, ROL, RLC, ASL,                              " Shift Control Signals
-            ADD, ADC, SBB, SUB, CMP, INC, DEC,                              " Adder Block Control Signals
-            AND, OR, XOR, NOT, TST,                                         " FBlock and TST Control Signals
+            LSR, ASR, ROR, RRC, ROL, RLC, ASL,                            
+            ADD, ADC, SBB, SUB, CMP, INC, DEC,                              
+            AND, OR, XOR, NOT, TST,                                  
             LOAD, POP, 
             Reset, Clock
             -> Accum7..Accum0, Flags7..Flags0);              
@@ -20,12 +20,14 @@ TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as 
 "               AND, OR, XOR, NOT, TST                         - FBlock Control Signals                                        
 "               Reset, Clock                                
 "
-" Outputs:      Accum[7..0]                     - 8 bits of accumulator
-"               Flags[7..0]  - ALU Status Flags                             
+" Outputs:      Accum[7..0]                                    - 8 bits of accumulator
+"               Flags[7..0]                                    - 8 bits of ALU status flags                             
 "
 " Revision History:
 " 02/26/26   Olivia Xu  Initial Revision
-" TODO 
+" 02/27/26   Olivia Xu  Bug / syntax fixes
+" 02/27/26   Olivia Xu  Overflow flag error fix
+" 02/28/26   Olivia Xu  Added more comments
 
 " Pin/Signal Declarations
 
@@ -34,8 +36,8 @@ Data7..Data0                                pin;        "input  8 bits of operan
 RRC, ROL, RLC, ASL, LSR, ASR, ROR           pin;        "input  Rotate / shift operation control signals
 ADD, ADC, SBB, SUB, CMP, INC, DEC           pin;        "input  Adder block control signals
 AND, OR, XOR, NOT, TST                      pin;        "input  functional / logical control signals
-LOAD, POP                                   pin;        
-Reset, Clock                                pin;
+LOAD, POP                                   pin;        "input  load and popping control signals 
+Reset, Clock                                pin;        "input  system clock and reset
 
 " Outputs
 Accum7..Accum0                              pin;        "output  8 bits of accumulator
@@ -44,25 +46,26 @@ Flags7..Flags0                              pin;        "output  8 bits of flags
 " Intermediate Terms
 
 MuxOut7..MuxOut0                            node;       " output of the 2:1 mux of the ALU
-AdderCarry8                                 node;        
-AdderCarry7                                 node;
-ShiftCarry                                  node;
-ControlOp                                   node;
-FunctionOp                                  node;
-Hold                                        node; 
-Subtract                                    node;    
+AdderCarry8                                 node;       " Carryout from the Adder
+AdderCarry7                                 node;       " Carryin from the Adder
+ShiftCarry                                  node;       " The bit shifted out during shift/rotate ops
+ControlOp                                   node;       " 1 for math / logic ops, 0 for shift
+FunctionOp                                  node;       " 1 for logic ops (AND/OR/XOR/NOT/TST)
+Hold                                        node;       " HOLD control signal passed into ALUBlocks
+Subtract                                    node;       " Subtraction operation (SUB/SBB/CMP)
 
 " Buses
-Data = [Data7..Data0];                                  
-MuxOut = [MuxOut7..MuxOut0];
+Data = [Data7..Data0];                                  " 8-bit bus for Operand B input
+MuxOut = [MuxOut7..MuxOut0];                            " 8-bit bus holding the final ALU result
 
 " Constants 
 
-" we have this from the truth table from the video 
-" we only care about AND, NOT, OR, XOR
+" Derived the following from the truth table from the video 
+" We only care about AND, NOT, OR, XOR (from the slides)
+" Used to define FOp3..FOp0 control signals of the FBlok 
 
-AandB = [1, 0, 0, 0];
-AorB = [1, 1, 1, 0];
+AandB = [1, 0, 0, 0];                                   
+AorB = [1, 1, 1, 0];                                    
 AxorB = [0, 1, 1, 0];
 notA = [0, 0, 1, 1];
 notB = [0, 1, 0, 1];
@@ -70,21 +73,21 @@ opB = [1, 0, 1, 0];
 
 " StatusRegister and ALUBlocks modules
 ALUBlocks INTERFACE (Data7..Data0,                                           
-                LSR, ASR, ROR, RRC, ROL, RLC, ASL,                               " Shift Control Signals
-                FOp3..FOp0,                                          " FBlock Control Signals
-                ADD, ADC, SBB, SUB,                                             " Adder Block Control Signals
-                CMP,                                                            " Control signal for Comparison
-                INC, DEC,                                                        " Control signal for incrementing
+                LSR, ASR, ROR, RRC, ROL, RLC, ASL,                                 
+                FOp3..FOp0,                                                        
+                ADD, ADC, SBB, SUB,                                                 
+                CMP,                                                              
+                INC, DEC,                                                           
                 TST,
                 HOLD,
-                ControlOp,                                                       " ControlOp signal from Control Unit into 2:1 mux 
-                CarryFlag, 
+                ControlOp,                                                          
+                CarryFlag,
                 LOAD,                                
                 Clock, Reset                                                            
-                -> Accum7..Accum0,                                              " The main registered data output
-                   MuxOut7..MuxOut0,                                            " ALU Result for Flag Computation
-                   AdderCarry8, AdderCarry7,                               " Adder Flags for Flag Computation          
-                   ShiftCarry);
+                -> Accum7..Accum0,                                                  
+                   MuxOut7..MuxOut0,                                                
+                   AdderCarry8, AdderCarry7,                                                  
+                   ShiftCarry);                                                     
 
 StatusRegister INTERFACE       (MuxOut7..MuxOut0, 
                                 Data7..Data0,
@@ -93,13 +96,14 @@ StatusRegister INTERFACE       (MuxOut7..MuxOut0,
                                 ShiftCarry,
                                 POP,
                                 HOLD,
-                                ControlOp,                     " If we are doing adder (1) or a shift (0)
+                                ControlOp,                     
                                 FunctionOp,
                                 Subtract,
                                 ASL, RLC,
                                 Clock, Reset                     
                                 -> Flags7..Flags0);
 
+" create instances of the above modules
 Accumulator     FUNCTIONAL_BLOCK    ALUBlocks;
 StatusReg  FUNCTIONAL_BLOCK    StatusRegister;
 
@@ -107,24 +111,25 @@ EQUATIONS
 
 " FBlock Control Signal Generation
 
-Accumulator.[FOp3..FOp0] = (AorB & OR) # 
+Accumulator.[FOp3..FOp0] = (AorB & OR) #                            
                            (notA & NOT) #
-                           (AandB & (AND # TST)) # 
+                           (AandB & (AND # TST)) #                          
                            (AxorB & XOR) #
-                           (opB & (ADD # ADC)) # 
-                           (notB & (SUB # SBB # CMP)) # 
-                           (0 & INC) # 
-                           (1 & DEC);  
+                           (opB & (ADD # ADC)) #                        " we want the F = B (output) (pass B straight through to the adder)
+                           (notB & (SUB # SBB # CMP)) #                 " we want F = notB if we are SUB, SBB, CMP (invert B for 2s complement)
+                           (0 & INC) #                                  " If INC, want B to 0 (Adder calculates A + 0 + 1)
+                           (1 & DEC);                                   " If DEC, want B to all 1s
 
+" Hold if all the other operations are not true
 Hold = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL # ADD # ADC # SBB # SUB # CMP # INC # DEC # AND # OR # XOR # NOT # TST);
 
-" Generate ControlOp (1 for Adder, 0 for Shifts)
+" Generate ControlOp (1 for Adder, 0 for Shift operations)
 ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
 
 " Generate FunctionOp (1 for function / logic operations, 0 otherwise)
 FunctionOp = (AND # OR # XOR # NOT # TST);
 
-" Generate Subtract 
+" Generate Subtract control signal 
 Subtract = (SUB # SBB # DEC # CMP);
 
 " Inputs into the Accumulator
@@ -148,7 +153,7 @@ Accumulator.TST = TST;
 Accumulator.HOLD = Hold;
 Accumulator.Reset = Reset;              
 Accumulator.Clock = Clock;
-Accumulator.ControlOp = ControlOp;              " control signal from the control unit into the 2:1 mux 
+Accumulator.ControlOp = ControlOp;
 Accumulator.LOAD = LOAD;
 
 " Extract outputs of the accumulator
