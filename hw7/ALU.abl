@@ -171,6 +171,8 @@ StatusReg.Clock = Clock;
 StatusReg.Reset = Reset;
 StatusReg.HOLD = LOAD;
 StatusReg.Subtract = Subtract;
+StatusReg.ASL = ASL;
+StatusReg.RLC = RLC;
 
 " Extract the flags from the status register
 " The carry flags are active low, so we !StatusReg
