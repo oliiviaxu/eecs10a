@@ -139,7 +139,6 @@ Flags0 = ALUnit.Zero;
 Flags1 = ALUnit.Sign;
 Flags2 = ALUnit.Overflow;
 Flags3 = ALUnit.CarryFlag;
-Flags7..Flags4 = 0;           
 
 AccumAddr[12..8] = 0;
 XReg = 0;
