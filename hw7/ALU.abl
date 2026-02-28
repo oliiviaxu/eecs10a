@@ -10,12 +10,8 @@ INTERFACE  (Data7..Data0,
 TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as well as the status register to form the ALU'
 
 " Description:   Wrapper module for the ALU. 
-"                This module connects the ALUBlocks with the 
-"                Status Register. It decodes the signals 
-"                (ADD, SUB, AND, LSR, etc) into the appropriate FBlock control 
-"                signals (FOp) and routes the data, carries, and 
-"                control signals between the blocks to produce the 
-"                final Accumulator value and Status Flags.
+"                This module connects ALUBlocks with the 
+"                Status Register.
 "
 " Inputs:       
 "               Data7..Data0                                   - 8 bits of Operand B
@@ -33,24 +29,22 @@ TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as 
 
 " Pin/Signal Declarations
 
-" TODO: write comments 
-
 " Inputs 
-Data7..Data0                                pin;    
-RRC, ROL, RLC, ASL, LSR, ASR, ROR           pin;    
-ADD, ADC, SBB, SUB, CMP, INC, DEC           pin;
-AND, OR, XOR, NOT, TST                      pin;
-LOAD, POP                                   pin;
+Data7..Data0                                pin;        "input  8 bits of operand B (from the video diagram)
+RRC, ROL, RLC, ASL, LSR, ASR, ROR           pin;        "input  Rotate / shift operation control signals
+ADD, ADC, SBB, SUB, CMP, INC, DEC           pin;        "input  Adder block control signals
+AND, OR, XOR, NOT, TST                      pin;        "input  functional / logical control signals
+LOAD, POP                                   pin;        
 Reset, Clock                                pin;
 
 " Outputs
-Accum7..Accum0                              pin;
-Flags7..Flags0              pin;
+Accum7..Accum0                              pin;        "output  8 bits of accumulator
+Flags7..Flags0                              pin;        "output  8 bits of flags
 
 " Intermediate Terms
 
-MuxOut7..MuxOut0                            node;
-AdderCarry8                                 node;
+MuxOut7..MuxOut0                            node;       " output of the 2:1 mux of the ALU
+AdderCarry8                                 node;        
 AdderCarry7                                 node;
 ShiftCarry                                  node;
 ControlOp                                   node;
@@ -124,6 +118,8 @@ Hold = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL # ADD # ADC # SBB # SUB # CMP #
 
 " Generate ControlOp (1 for Adder, 0 for Shifts)
 ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
+
+" Generate FunctionOp (1 for function / logic operations, 0 otherwise)
 FunctionOp = (AND # OR # XOR # NOT # TST);
 
 " Inputs into the Accumulator
@@ -171,6 +167,7 @@ StatusReg.Reset = Reset;
 StatusReg.HOLD = LOAD;
 
 " Extract the flags from the status register
+" The carry flags are active low, so we !StatusReg
 
 [Flags7..Flags0] = !StatusReg.[Flags7..Flags0];
 

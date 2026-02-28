@@ -19,11 +19,7 @@ INTERFACE       (Data7..Data0,
 TITLE           'FBlock, Adder, and Shift Block Implementation in ALU'
 
 " Description:   This module performs all adding, FBlock, and shift/rotate 
-"                operations. It has 3 main stages:
-"                  1. A Shift/Rotate block 
-"                  2. An FBlock
-"                  3. An 8-bit Adder 
-"                It outputs the final ALU result and the 
+"                operations. It outputs the final ALU result and the 
 "                carry signals (both adder and shift) to the Status Register for flag calculation.
 "
 " Inputs:       
@@ -35,7 +31,7 @@ TITLE           'FBlock, Adder, and Shift Block Implementation in ALU'
 "               ROL                             - Control Signal for Rotate Left
 "               RLC                             - Control Signal for Rotate Left through Carry
 "               ASL                             - Control Signal for Arithmetic Shift Left
-"               FOp3..FOp0                       - Control Signal for FBlock: corresponding to ALUOp0..3 in the video
+"               FOp3..FOp0                      - Control Signal for FBlock: corresponding to ALUOp0..3 in the video
 "               ADD                              
 "               ADC        
 "               TST                     
@@ -61,7 +57,7 @@ TITLE           'FBlock, Adder, and Shift Block Implementation in ALU'
 
 " Inputs 
 
-Data7..Data0                pin;    "input  8 bits of operand B in the ALU
+Data7..Data0                        pin;    "input  8 bits of operand B in the ALU
 LSR                                 pin;    "input  control signal for logical shift right 
 ASR                                 pin;    "input  control signal for arithmetic shift right
 ROR                                 pin;    "input  control signal for rotate right
@@ -88,8 +84,8 @@ Reset                               pin;
 " Outputs
 Accum7..Accum0                      pin ISTYPE 'REG, KEEP';    "output  8 bits of accumulator
 MuxOut7..MuxOut0                                       pin;                    
-AdderCarry8                                                pin;
-AdderCarry7                                                pin;
+AdderCarry8                                            pin;
+AdderCarry7                                            pin;
 ShiftCarry                                             pin;
 
 " Intermediate Terms
@@ -98,7 +94,7 @@ B7..B0                                     node;  " One of the inputs into the a
 AdderOutput7..AdderOutput0                 node;  " Output of the adder block that goes into 2:1 mux and Flag calc. 
 ShiftOutput7..ShiftOutput0                 node;  " Output of the shift block that goes into 2:1 mux and Flag calc.
 F7..F0                                     node;  " Output of the FBlock that goes into the adder block
-AdderCarry6..AdderCarry0                           node;
+AdderCarry6..AdderCarry0                   node;  " Remaining 7 carry bits that are used for addition
 
 " Buses
 Data = [Data7..Data0];                                      " 8 bits of operand B
@@ -108,9 +104,9 @@ F = [F7..F0];                                               " Output of the FBlo
 A = [A7..A0];                                               " One of the inputs into the adder block 
 B = [B7..B0];                                               " The other inputs into the adder block from the FBlock 
 AdderOutput = [AdderOutput7..AdderOutput0];                 " Output of the adder block that goes into 2:1 mux and Flag calc.
-AdderCarry = [AdderCarry8..AdderCarry0];                                   " 9 bits of carry used in the adder block
+AdderCarry = [AdderCarry8..AdderCarry0];                    " 9 bits of carry used in the adder block
 MuxOut = [MuxOut7..MuxOut0];                                " Output of 2:1 mux of the ALU 
-FOp = [FOp3..FOp0];                                         
+FOp = [FOp3..FOp0];                                         " FBlock control signals
 
 
 EQUATIONS
@@ -159,10 +155,10 @@ B = F;                                                            " When we are 
 
 " Performing the addition below
 
-AdderCarry0 = (0 & (ADD # DEC)) #
-              (1 & (SUB # INC # CMP)) #
-              (!CarryFlag & ADC) #
-              (CarryFlag & SBB);
+AdderCarry0 = (0 & (ADD # DEC)) #                       " we dont want to add carry if its ADD or DEC
+              (1 & (SUB # INC # CMP)) #                 " twos complement adding 1
+              (!CarryFlag & ADC) #                      " carry flags are active low 
+              (CarryFlag & SBB);                        
 
 [AdderCarry8..AdderCarry1] = (A & B) # ([AdderCarry7..AdderCarry0] & (A $ B));          " AdderInput and Data correspond to A0 and B0 in HW4
 AdderOutput = A $ B $ [AdderCarry7..AdderCarry0];                                             " 8-bit vector / bus

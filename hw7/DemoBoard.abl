@@ -23,11 +23,7 @@ TITLE      'ALU Unit Demo'
 
 " Revision History:
 " 02/26/26   Olivia Xu      Initial Revision
-" 02/14/18   Olivia Xu      Fixed some typos
-" 02/14/18   Olivia Xu      Specialized for ALU
-" 01/08/20   Olivia Xu      Updated comments
-" 01/04/21   Olivia Xu      Updated comments
-
+" 02/27/26   Olivia Xu      Fixed some typos, updated control signals
 
 
 " Pin/Signal Declarations
