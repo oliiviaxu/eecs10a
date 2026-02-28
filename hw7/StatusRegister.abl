@@ -81,7 +81,7 @@ Flags.CLR = !Reset;
 Zero = !(MuxOut7 # MuxOut6 # MuxOut5 # MuxOut4 # MuxOut3 # MuxOut2 # MuxOut1 # MuxOut0); 
 Sign = MuxOut7;
 
-" If FunctionOp = 1 or were holding, we don't modify overflow, we keep prev overlfow (flags2)
+" If FunctionOp = 1 or were holding, we keep prev overlfow (flags2)
 Overflow = ((ASL # RLC) & (MuxOut7 $ ShiftCarry) #                              " MuxOut7 is MSB after the shift, ShiftCarry is MSB before the shift, if MSB changes -> overflow (XOR)
            ((AdderCarry8 $ AdderCarry7) & (ControlOp & !FunctionOp)) #          
            (Flags2 & (FunctionOp # HOLD)));                                     " LSL issue

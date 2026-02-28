@@ -92,8 +92,8 @@ AdderCarry7                                            pin;         "output  Car
 ShiftCarry                                             pin;         "output  Bit shifted out during shift / rotate operations
 
 " Intermediate Terms
-A7..A0                                     node;  " One of the inputs into the adder
-B7..B0                                     node;  " One of the inputs into the adder (from the FBlock)
+A7..A0                                     node;  " One of the inputs into the adder block 
+B7..B0                                     node;  " One of the inputs into the adder block (from the FBlock)
 AdderOutput7..AdderOutput0                 node;  " Output of the adder block that goes into 2:1 mux and Flag calc. 
 ShiftOutput7..ShiftOutput0                 node;  " Output of the shift block that goes into 2:1 mux and Flag calc.
 F7..F0                                     node;  " Output of the FBlock that goes into the adder block
@@ -107,7 +107,7 @@ F = [F7..F0];                                               " Output of the FBlo
 A = [A7..A0];                                               " One of the inputs into the adder block 
 B = [B7..B0];                                               " The other input into the adder block from the FBlock 
 AdderOutput = [AdderOutput7..AdderOutput0];                 " Output of the adder block that goes into 2:1 mux and Flag calc.
-AdderCarry = [AdderCarry8..AdderCarry0];                    " 9 bits of carry used in the adder block
+AdderCarry = [AdderCarry8..AdderCarry0];                    " 9 bits of carry used in the adder
 MuxOut = [MuxOut7..MuxOut0];                                " Output of 2:1 mux of the ALU 
 FOp = [FOp3..FOp0];                                         " FBlock control signals
 
@@ -154,7 +154,7 @@ F  =  (FOp0 & !Accum & !Data) #               " AB = 00 -> FOp1
 
 " Adder Equations
 
-A = (ADD # ADC # SUB # SBB # CMP # INC # DEC) & Accum;            " We want to passwhatevers in accum into the adder whenever doing math or a comparison
+A = (ADD # ADC # SUB # SBB # CMP # INC # DEC) & Accum;            " We want to pass whatevers in accum into the adder whenever doing math or a comparison
 B = F;                                                            " When we are adding, second input into the adder is the output of the FBlock
 
 " Performing the addition below

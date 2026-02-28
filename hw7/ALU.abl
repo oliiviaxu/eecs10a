@@ -26,7 +26,7 @@ TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as 
 " Revision History:
 " 02/26/26   Olivia Xu  Initial Revision
 " 02/27/26   Olivia Xu  Bug / syntax fixes
-" 02/27/26   Olivia Xu  Overflow flag error fix
+" 02/27/26   Olivia Xu  Overflow flag error not showing up fix for LSL test case
 " 02/28/26   Olivia Xu  Added more comments
 
 " Pin/Signal Declarations
@@ -49,7 +49,7 @@ MuxOut7..MuxOut0                            node;       " output of the 2:1 mux 
 AdderCarry8                                 node;       " Carryout from the Adder
 AdderCarry7                                 node;       " Carryin from the Adder
 ShiftCarry                                  node;       " The bit shifted out during shift/rotate ops
-ControlOp                                   node;       " 1 for math / logic ops, 0 for shift
+ControlOp                                   node;       " 1 for adder ops, 0 for shift
 FunctionOp                                  node;       " 1 for logic ops (AND/OR/XOR/NOT/TST)
 Hold                                        node;       " HOLD control signal passed into ALUBlocks
 Subtract                                    node;       " Subtraction operation (SUB/SBB/CMP)
@@ -117,8 +117,8 @@ Accumulator.[FOp3..FOp0] = (AorB & OR) #
                            (AxorB & XOR) #
                            (opB & (ADD # ADC)) #                        " we want the F = B (output) (pass B straight through to the adder)
                            (notB & (SUB # SBB # CMP)) #                 " we want F = notB if we are SUB, SBB, CMP (invert B for 2s complement)
-                           (0 & INC) #                                  " If INC, want B to 0 (Adder calculates A + 0 + 1)
-                           (1 & DEC);                                   " If DEC, want B to all 1s
+                           (0 & INC) #                                  " If INC, want B to be 0
+                           (1 & DEC);                                   " If DEC, want B to be all 1s
 
 " Hold if all the other operations are not true
 Hold = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL # ADD # ADC # SBB # SUB # CMP # INC # DEC # AND # OR # XOR # NOT # TST);
