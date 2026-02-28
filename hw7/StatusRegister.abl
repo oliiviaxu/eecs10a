@@ -78,7 +78,7 @@ Overflow = (((AdderCarry8 $ AdderCarry7) & (ControlOp & !FunctionOp)) #
 " If FunctionOp = 1, we don't modify carry 
 " If ControlOp is 1 (Adder), pass AdderCarry8
 " If ControlOp is 0 (Shift), pass ShiftCarry
-Carry = (AdderCarry8 & ControlOp) # (ShiftCarry & !(ControlOp & !FunctionOp)) # (Flags3 & FunctionOp); 
+Carry = (AdderCarry8 & (ControlOp & !FunctionOp)) # (ShiftCarry & !ControlOp) # (Flags3 & FunctionOp); 
 
 " If we're not popping or holding, we update the flags, if we're popping, we load data into the flags, and if we're holding and not popping, we load the previous flags
 Flags := ([0, 0, 0, 0, Carry, Overflow, Sign, Zero] & !(POP # HOLD)) # (Data & POP) # (Flags & (!POP & HOLD));
