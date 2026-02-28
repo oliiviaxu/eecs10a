@@ -1,6 +1,6 @@
 MODULE          ALUBlocks
 INTERFACE       (Data7..Data0,                                           
-                LSR, ASR, ROR, RRC, ROL, RLC, ASL                               " Shift Control Signals
+                LSR, ASR, ROR, RRC, ROL, RLC, ASL,                               " Shift Control Signals
                 FOp3..FOp0,                                                     " FBlock Control Signals
                 ADD, ADC, SBB, SUB,                                             " Adder Block Control Signals
                 CMP,                                                            " Control signal for Comparison

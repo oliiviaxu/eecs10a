@@ -49,13 +49,13 @@ Flags7..Flags0              pin;
 
 " Intermediate Terms
 
-MuxOut7..MuxOut0                      node;
-AdderCarry8                              node;
+MuxOut7..MuxOut0                            node;
+AdderCarry8                                 node;
 AdderCarry7                                 node;
 ShiftCarry                                  node;
-ControlOp                               node;
-FunctionOp                              node;
-Hold                                    node;     
+ControlOp                                   node;
+FunctionOp                                  node;
+Hold                                        node;     
 
 " Buses
 Data = [Data7..Data0];                                  
@@ -75,7 +75,7 @@ opB = [1, 0, 1, 0];
 
 " StatusRegister and ALUBlocks modules
 ALUBlocks INTERFACE (Data7..Data0,                                           
-                LSR, ASR, ROR, RRC, ROL, RLC, ASL                               " Shift Control Signals
+                LSR, ASR, ROR, RRC, ROL, RLC, ASL,                               " Shift Control Signals
                 FOp3..FOp0,                                          " FBlock Control Signals
                 ADD, ADC, SBB, SUB,                                             " Adder Block Control Signals
                 CMP,                                                            " Control signal for Comparison
