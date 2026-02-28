@@ -96,6 +96,7 @@ StatusRegister INTERFACE       (MuxOut7..MuxOut0,
                                 ControlOp,                     " If we are doing adder (1) or a shift (0)
                                 FunctionOp,
                                 Subtract,
+                                ASL, RLC,
                                 Clock, Reset                     
                                 -> Flags7..Flags0);
 

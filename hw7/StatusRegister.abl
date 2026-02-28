@@ -9,6 +9,7 @@ INTERFACE       (MuxOut7..MuxOut0,
                  ControlOp,                     " If we are doing adder (1) or a shift (0)
                  FunctionOp,                    " If we are doing function operation, we don't want to modify carry and overflow
                  Subtract, 
+                 ASL, RLC,
                  Clock, Reset                     
                 -> Flags7..Flags0);
 
@@ -51,6 +52,8 @@ Clock                                   pin;
 Reset                                   pin;
 POP                                     pin;
 HOLD                                    pin;
+ASL                                     pin;
+RLC                                     pin;
 
 " Outputs
 Flags7..Flags0                          pin ISTYPE 'REG';    
@@ -74,8 +77,9 @@ Zero = !(MuxOut7 # MuxOut6 # MuxOut5 # MuxOut4 # MuxOut3 # MuxOut2 # MuxOut1 # M
 Sign = MuxOut7;
 
 " If FunctionOp = 1, we don't modify overflow
-Overflow = (((AdderCarry8 $ AdderCarry7) & (ControlOp & !FunctionOp)) # 
-           (Flags2 & (FunctionOp # HOLD)));
+Overflow = ((ASL # RLC) & (MuxOut7 $ ShiftCarry) # 
+           ((AdderCarry8 $ AdderCarry7) & (ControlOp & !FunctionOp)) # 
+           (Flags2 & (FunctionOp # HOLD)));                                     " LSL 
 
 " If FunctionOp = 1, we don't modify carry 
 " If ControlOp is 1 (Adder), pass AdderCarry8
