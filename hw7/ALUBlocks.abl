@@ -11,7 +11,7 @@ INTERFACE       (Data7..Data0,
                 Clock, Reset                                                            
                 -> Accum7..Accum0,                                              " The main registered data output
                    MuxOut7..MuxOut0,                                            " ALU Result for Flag Computation
-                   ACarry8, ACarry7,                               " Adder Flags for Flag Computation          
+                   AdderCarry8, AdderCarry7,                               " Adder Flags for Flag Computation          
                    ShiftCarry);
 
 TITLE           'FBlock, Adder, and Shift Block Implementation in ALU'
@@ -81,7 +81,8 @@ Reset                               pin;
 " Outputs
 Accum7..Accum0                      pin ISTYPE 'REG, KEEP';    "output  8 bits of accumulator
 MuxOut7..MuxOut0                                       pin;                    
-ACarry8..ACarry0                                         pin;
+AdderCarry8                                                pin;
+AdderCarry7                                                pin;
 ShiftCarry                                             pin;
 
 " Intermediate Terms
@@ -149,7 +150,7 @@ B = F;                                                            " When we are 
 
 " Performing the addition below
 
-ACarry0 = SUB # INC # (ADC & CarryFlag) # (SBB & !CarryFlag);   " Add inverted previous carry for SBB, add previous carry for ADC
+ACarry0 = SUB # CMP # INC # (ADC & CarryFlag) # (SBB & !CarryFlag);   " TODO: do I need CMP here, Add inverted previous carry for SBB, add previous carry for ADC
 
 [ACarry8..ACarry1] = (A & B) # ([ACarry7..ACarry0] & (A $ B));          " AdderInput and Data correspond to A0 and B0 in HW4
 AdderOutput = A $ B $ [ACarry7..ACarry0];                                             " 8-bit vector / bus
@@ -164,5 +165,9 @@ MuxOut = (AdderOutput & ControlOp) #                 " ControlOp = 1 -> AdderOut
 " If CMP = 0, Accum = MuxOut 
 
 Accum := ((CMP # TST) & Accum) # (!(CMP # TST) & MuxOut);
+
+" TODO: variables for output ACarry7 and ACarry8
+AdderCarry8 = ACarry8;
+AdderCarry7 = ACarry7;
 
 END ALUBlocks
