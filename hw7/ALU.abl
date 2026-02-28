@@ -3,8 +3,9 @@ INTERFACE  (Data7..Data0,
             LSR, ASR, ROR, RRC, ROL, RLC, ASL,                              " Shift Control Signals
             ADD, ADC, SBB, SUB, CMP, INC, DEC,                              " Adder Block Control Signals
             AND, OR, XOR, NOT, TST,                                         " FBlock and TST Control Signals
+            LOAD, POP, 
             Reset, Clock
-            -> Accum7..Accum0, Zero, Sign, Overflow, CarryFlag);             " Main Outputs
+            -> Accum7..Accum0, Flags7..Flags0);              
 
 TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as well as the status register to form the ALU'
 
@@ -24,7 +25,7 @@ TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as 
 "               Reset, Clock                                
 "
 " Outputs:      Accum[7..0]                     - 8 bits of accumulator
-"               Zero, Sign, Overflow, CarryFlag  - ALU Status Flags                             
+"               Flags[7..0]  - ALU Status Flags                             
 "
 " Revision History:
 " 02/26/26   Olivia Xu  Initial Revision
@@ -39,24 +40,26 @@ Data7..Data0                                pin;
 RRC, ROL, RLC, ASL, LSR, ASR, ROR           pin;    
 ADD, ADC, SBB, SUB, CMP, INC, DEC           pin;
 AND, OR, XOR, NOT, TST                      pin;
+LOAD, POP                                   pin;
 Reset, Clock                                pin;
 
 " Outputs
 Accum7..Accum0                              pin;
-Zero, Sign, Overflow, CarryFlag              pin;
+Flags7..Flags0              pin;
 
 " Intermediate Terms
 
 MuxOut7..MuxOut0                      node;
-ACarry8                              node;
-ACarry7                                 node;
+AdderCarry8                              node;
+AdderCarry7                                 node;
 ShiftCarry                                  node;
 ControlOp                               node;
+FunctionOp                              node;
+Hold                                    node;     
 
 " Buses
 Data = [Data7..Data0];                                  
 MuxOut = [MuxOut7..MuxOut0];
-" TODO: need this? ACarry = [ACarry8..ACarry0];
 
 " Constants 
 
@@ -78,17 +81,27 @@ ALUBlocks INTERFACE (Data7..Data0,
                 CMP,                                                            " Control signal for Comparison
                 INC, DEC,                                                        " Control signal for incrementing
                 TST,
+                HOLD,
                 ControlOp,                                                       " ControlOp signal from Control Unit into 2:1 mux 
-                CarryFlag,                                 
+                CarryFlag, 
+                LOAD,                                
                 Clock, Reset                                                            
                 -> Accum7..Accum0,                                              " The main registered data output
                    MuxOut7..MuxOut0,                                            " ALU Result for Flag Computation
-                   ACarry8, ACarry7,                               " Adder Flags for Flag Computation          
+                   AdderCarry8, AdderCarry7,                               " Adder Flags for Flag Computation          
                    ShiftCarry);
 
-StatusRegister INTERFACE (MuxOut7..MuxOut0, ACarry8, ACarry7, ShiftCarry, 
-                          ControlOp, Clock, Reset 
-                          -> Sign, Carry, Zero, Overflow);
+StatusRegister INTERFACE       (MuxOut7..MuxOut0, 
+                                Data7..Data0,
+                                AdderCarry8, 
+                                AdderCarry7,
+                                ShiftCarry,
+                                POP,
+                                HOLD,
+                                ControlOp,                     " If we are doing adder (1) or a shift (0)
+                                FunctionOp,
+                                Clock, Reset                     
+                                -> Flags7..Flags0);
 
 
 Accumulator     FUNCTIONAL_BLOCK    ALUBlocks;
@@ -107,8 +120,11 @@ Accumulator.[FOp3..FOp0] = (AorB & OR) #
                            (0 & INC) # 
                            (1 & DEC);  
 
+Hold = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL # ADD # ADC # SBB # SUB # CMP # INC # DEC # AND # OR # XOR # NOT # TST);
+
 " Generate ControlOp (1 for Adder, 0 for Shifts)
 ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
+FunctionOp = (AND # OR # XOR # NOT # TST);
 
 " Inputs into the Accumulator
 Accumulator.[Data7..Data0] = [Data7..Data0];
@@ -128,30 +144,34 @@ Accumulator.CMP = CMP;
 Accumulator.INC = INC;
 Accumulator.DEC = DEC;
 Accumulator.TST = TST;
+Accumulator.HOLD = Hold;
 Accumulator.Reset = Reset;              
 Accumulator.Clock = Clock;
 Accumulator.ControlOp = ControlOp;              " control signal from the control unit into the 2:1 mux 
+Accumulator.LOAD = LOAD;
 
 " Extract outputs of the accumulator
 [Accum7..Accum0] = Accumulator.[Accum7..Accum0];
 [MuxOut7..MuxOut0] = Accumulator.[MuxOut7..MuxOut0];
 ShiftCarry = Accumulator.ShiftCarry;
-ACarry8 = Accumulator.ACarry8;
-ACarry7 = Accumulator.ACarry7;
+AdderCarry8 = Accumulator.AdderCarry8;
+AdderCarry7 = Accumulator.AdderCarry7;
 
 " Outputs of the accuulator -> input into the status register 
 StatusReg.[MuxOut7..MuxOut0] = [MuxOut7..MuxOut0];
-StatusReg.ACarry8 = ACarry8;
-StatusReg.ACarry7 = ACarry7;
+StatusReg.[Data7..Data0] = [Data7..Data0];
+StatusReg.AdderCarry8 = AdderCarry8;
+StatusReg.AdderCarry7 = AdderCarry7;
 StatusReg.ShiftCarry = ShiftCarry;
+StatusReg.POP = POP;
 StatusReg.ControlOp = ControlOp;
+StatusReg.FunctionOp = FunctionOp;
 StatusReg.Clock = Clock;
 StatusReg.Reset = Reset;
+StatusReg.HOLD = LOAD;
 
 " Extract the flags from the status register
-Zero = StatusReg.Zero;
-Sign = StatusReg.Sign;
-Overflow = StatusReg.Overflow;
-CarryFlag = StatusReg.Carry;                            " TODO: do i change this? 
+
+[Flags7..Flags0] = !StatusReg.[Flags7..Flags0];
 
 END ALU

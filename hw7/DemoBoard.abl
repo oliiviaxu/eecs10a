@@ -88,9 +88,10 @@ SReg       =  [SReg7..SReg0];			    "8 bit S-Register
 ALU INTERFACE  (Data7..Data0,
                 LSR, ASR, ROR, RRC, ROL, RLC, ASL,                              
                 ADD, ADC, SBB, SUB, CMP, INC, DEC,                              
-                AND, OR, XOR, NOT, TST,                                         
+                AND, OR, XOR, NOT, TST,  
+                LOAD, POP,                                       
                 Reset, Clock
-                -> Accum7..Accum0, Zero, Sign, Overflow, CarryFlag);
+                -> Accum7..Accum0, Flags7..Flags0);
 
 " create an instance of the unit to be tested  
 
@@ -131,14 +132,18 @@ ALUnit.RRC = Control15;
 ALUnit.ROL = Control16;
 ALUnit.RLC = Control17;
 ALUnit.ASL = Control18;
+ALUnit.LOAD = Control19;
+ALUnit.POP = Control20;
 
 " ALU Outputs
 
 [AccumAddr7..AccumAddr0]  =  ALUnit.[Accum7..Accum0];
-Flags0 = ALUnit.Zero;
-Flags1 = ALUnit.Sign;
-Flags2 = ALUnit.Overflow;
-Flags3 = ALUnit.CarryFlag;
+[Flags7..Flags0] = ALUnit.[Flags7..Flags0];
+
+" Flags0 = ALUnit.Zero;
+" Flags1 = ALUnit.Sign;
+" Flags2 = ALUnit.Overflow;
+" Flags3 = ALUnit.CarryFlag;
 
 AccumAddr[12..8] = 0;
 XReg = 0;

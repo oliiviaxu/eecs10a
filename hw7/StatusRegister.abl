@@ -1,11 +1,15 @@
 MODULE          StatusRegister
 INTERFACE       (MuxOut7..MuxOut0, 
-                 ACarry8, 
-                 ACarry7,
+                 Data7..Data0,
+                 AdderCarry8, 
+                 AdderCarry7,
                  ShiftCarry,
+                 POP,
+                 HOLD,
                  ControlOp,                     " If we are doing adder (1) or a shift (0)
+                 FunctionOp,                    " If we are doing function operation, we don't want to modify carry and overflow 
                  Clock, Reset                     
-                -> Sign, Carry, Zero, Overflow);
+                -> Flags7..Flags0);
 
 TITLE           'Status Register'
 
@@ -14,12 +18,13 @@ TITLE           'Status Register'
 "                ALU's outputs (MuxOut and Carry/ShiftCarry).
 "
 " Inputs:        MuxOut7..MuxOut0               - The 8-bit result from the 2:1 mux
-"                ACarry8                        - 
-"                ACarry7                        - 
+"                AdderCarry8                        - 
+"                AdderCarry7                        - 
 "                ShiftCarry                     - 
 "                ControlOp                      - 1 = Adding, 0 = Shift 
 "                Clock                          
 "                Reset 
+" TODO 
 "
 " Outputs:       Sign                           - 1 if the ALU result is negative
 "                Carry                          - The carry out from adder, or the bit shifted out
@@ -34,50 +39,48 @@ TITLE           'Status Register'
 
 " Inputs 
 MuxOut7..MuxOut0                        pin;
-ACarry8                                 pin;
-ACarry7                                 pin;
+Data7..Data0                            pin;
+AdderCarry8                                 pin;
+AdderCarry7                                 pin;
 ShiftCarry                              pin;
 ControlOp                               pin;
+FunctionOp                              pin;
 Clock                                   pin;
 Reset                                   pin;
+POP                                     pin;
+HOLD                                    pin;
 
-" Outputs (Must be registers!)
-Sign                        pin ISTYPE 'REG';
-Carry                       pin ISTYPE 'REG';
-Zero                        pin ISTYPE 'REG';
-Overflow                    pin ISTYPE 'REG';
+" Outputs
+Flags7..Flags0                          pin ISTYPE 'REG';    
 
-" Intermediate Terms (Combinational calculations before saving)
-Z                      node;
-N                      node;
-V                      node;
-C                      node;
+" Intermediate Terms
+Zero                      node;
+Sign                      node;
+Overflow                      node;
+Carry                      node;
+
+" Buses
+Flags = [Flags7..Flags0];
+Data = [Data7..Data0];
 
 EQUATIONS
 
-" 1. Wire the master clock to all four flip-flops
-Sign.CLK     = Clock;
-Carry.CLK    = Clock;
-Zero.CLK     = Clock;
-Overflow.CLK = Clock;
-Sign.CLR = !Reset;
-Carry.CLR = !Reset;
-Zero.CLR = !Reset;
-Overflow.CLR = !Reset;
+Flags.CLK = Clock;
+Flags.CLR = !Reset;
 
-" 2. Compute the raw flags combinatorially
-Z = !(MuxOut7 # MuxOut6 # MuxOut5 # MuxOut4 # MuxOut3 # MuxOut2 # MuxOut1 # MuxOut0); 
-N = MuxOut7;
-V = ACarry8 $ ACarry7;
+Zero = !(MuxOut7 # MuxOut6 # MuxOut5 # MuxOut4 # MuxOut3 # MuxOut2 # MuxOut1 # MuxOut0); 
+Sign = MuxOut7;
 
-" If ControlOp is 1 (Adder), pass ACarry8. 
-" If ControlOp is 0 (Shift), pass ShiftCarry.
-C = (ACarry8 & ControlOp) # (ShiftCarry & !ControlOp);
+" If FunctionOp = 1, we don't modify overflow
+Overflow = (((AdderCarry8 $ AdderCarry7) & (ControlOp & !FunctionOp)) # 
+           (Flags2 & (FunctionOp # HOLD)));
 
-" 3. Save the calculated values into the registers on the clock edge
-Zero     := Z;
-Sign     := N;
-Overflow := V;
-Carry    := C;
+" If FunctionOp = 1, we don't modify carry 
+" If ControlOp is 1 (Adder), pass AdderCarry8
+" If ControlOp is 0 (Shift), pass ShiftCarry
+Carry = (AdderCarry8 & ControlOp) # (ShiftCarry & !(ControlOp & !FunctionOp)) # (Flags3 & FunctionOp); 
+
+" If we're not popping or holding, we update the flags, if we're popping, we load data into the flags, and if we're holding and not popping, we load the previous flags
+Flags := ([0, 0, 0, 0, Carry, Overflow, Sign, Zero] & !(POP # HOLD)) # (Data & POP) # (Flags & (!POP & HOLD));
 
 END StatusRegister

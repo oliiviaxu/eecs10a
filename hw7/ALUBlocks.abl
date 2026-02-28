@@ -6,8 +6,10 @@ INTERFACE       (Data7..Data0,
                 CMP,                                                            " Control signal for Comparison
                 INC, DEC,                                                        " Control signal for incrementing
                 TST,
+                HOLD,
                 ControlOp,                                                       " ControlOp signal from Control Unit into 2:1 mux 
-                CarryFlag,                                 
+                CarryFlag, 
+                LOAD,                                 
                 Clock, Reset                                                            
                 -> Accum7..Accum0,                                              " The main registered data output
                    MuxOut7..MuxOut0,                                            " ALU Result for Flag Computation
@@ -40,12 +42,15 @@ TITLE           'FBlock, Adder, and Shift Block Implementation in ALU'
 "               SUB                              
 "               CMP                             
 "               SBB                             
-"               INC                             
-"               CarryFlag                       - Carry or borrow flag input 
+"               INC 
+"               HOLD                            
+"               CarryFlag                       - Carry flag input
+"               Clock                        
+"               Reset                       
 "
 " Outputs:      Accum[7..0]                      - 8 bits of accumulator
 "               MuxOut7..MuxOut0,                - ALU Result for Flag Computation
-"               ACarry8..ACarry0,                  - Adder Flags for Flag Computation 
+"               AdderCarry8..AdderCarry0,                  - Adder Flags for Flag Computation 
 "               ShiftCarry                       - Shifter Flags for Flag Computation
 "
 " Revision History:
@@ -73,6 +78,8 @@ SBB                                 pin;
 INC                                 pin;
 DEC                                 pin;
 TST                                 pin;
+HOLD                                pin;
+LOAD                                pin;
 CarryFlag                           pin;
 ControlOp                           pin;
 Clock                               pin;
@@ -91,7 +98,7 @@ B7..B0                                     node;  " One of the inputs into the a
 AdderOutput7..AdderOutput0                 node;  " Output of the adder block that goes into 2:1 mux and Flag calc. 
 ShiftOutput7..ShiftOutput0                 node;  " Output of the shift block that goes into 2:1 mux and Flag calc.
 F7..F0                                     node;  " Output of the FBlock that goes into the adder block
-ACarry8..ACarry0                           node;
+AdderCarry8..AdderCarry0                           node;
 
 " Buses
 Data = [Data7..Data0];                                      " 8 bits of operand B
@@ -101,7 +108,7 @@ F = [F7..F0];                                               " Output of the FBlo
 A = [A7..A0];                                               " One of the inputs into the adder block 
 B = [B7..B0];                                               " The other inputs into the adder block from the FBlock 
 AdderOutput = [AdderOutput7..AdderOutput0];                 " Output of the adder block that goes into 2:1 mux and Flag calc.
-ACarry = [ACarry8..ACarry0];                                   " 9 bits of carry used in the adder block
+AdderCarry = [AdderCarry8..AdderCarry0];                                   " 9 bits of carry used in the adder block
 MuxOut = [MuxOut7..MuxOut0];                                " Output of 2:1 mux of the ALU 
 FOp = [FOp3..FOp0];                                         
 
@@ -109,6 +116,7 @@ FOp = [FOp3..FOp0];
 EQUATIONS
 
 Accum.CLK = Clock;
+Accum.CLR = !Reset;
 
 " Shift Equations 
 
@@ -122,7 +130,7 @@ Accum.CLK = Clock;
 ShiftOutput0  =  (Accum7 & ROL) #                                   " A_0 -> A_n_1 
                  (0 & ASL) #                                           " A_0 -> 0     
                  (Accum1 & (LSR # ASR # ROR # RRC)) #               " A_0 -> A_1   
-                 (CarryFlag & RLC);                                        " A_0 -> C
+                 (!CarryFlag & RLC);                                        " A_0 -> C
 
 " Handling the high bit (R_n - 1)
 
@@ -130,7 +138,7 @@ ShiftOutput7  =  (Accum6 & (ROL # RLC # ASL)) #                     " A_n-1 -> A
                 (Accum7 & ASR) #                                    " A_n-1 -> A_n-1
                 (Accum0 & ROR) #                                    " A_n-1 -> A_0
                 (0 & LSR) #                                         " A_n-1 -> 0
-                (CarryFlag & RRC);                                  " A_n-1 -> C
+                (!CarryFlag & RRC);                                  " A_n-1 -> C
 
 ShiftCarry = ((LSR # ASR # ROR # RRC) & Accum0) #                   " When we shift right, save LSB
              ((ASL # ROL # RLC) & Accum7);                          " When we shift left, save MSB
@@ -151,10 +159,14 @@ B = F;                                                            " When we are 
 
 " Performing the addition below
 
-ACarry0 = SUB # CMP # INC # (ADC & CarryFlag) # (SBB & !CarryFlag);   " TODO: do I need CMP here, Add inverted previous carry for SBB, add previous carry for ADC
+AdderCarry0 = (0 & (ADD # DEC)) #
+              (1 & (SUB # INC # CMP)) #
+              (CarryFlag & ADC) #
+              (!CarryFlag & SBB);
+AdderCarry0 = SUB # CMP # INC # (ADC & CarryFlag) # (SBB & !CarryFlag);   " TODO: do I need CMP here, Add inverted previous carry for SBB, add previous carry for ADC
 
-[ACarry8..ACarry1] = (A & B) # ([ACarry7..ACarry0] & (A $ B));          " AdderInput and Data correspond to A0 and B0 in HW4
-AdderOutput = A $ B $ [ACarry7..ACarry0];                                             " 8-bit vector / bus
+[AdderCarry8..AdderCarry1] = (A & B) # ([AdderCarry7..AdderCarry0] & (A $ B));          " AdderInput and Data correspond to A0 and B0 in HW4
+AdderOutput = A $ B $ [AdderCarry7..AdderCarry0];                                             " 8-bit vector / bus
 
 " Implementation of 2:1 mux to select one of the outputs (AdderOutput or ShiftOutput) 
 
@@ -164,11 +176,8 @@ MuxOut = (AdderOutput & ControlOp) #                 " ControlOp = 1 -> AdderOut
 " If doing comparison, set accumulator accordingly 
 " If CMP = 1, compare with accumulator 
 " If CMP = 0, Accum = MuxOut 
-
-Accum := ((CMP # TST) & Accum) # (!(CMP # TST) & MuxOut);
-
-" TODO: variables for output ACarry7 and ACarry8
-AdderCarry8 = ACarry8;
-AdderCarry7 = ACarry7;
+" If HOLD, CMP, or TST, save the old Accum value 
+Accum := ((((CMP # TST # HOLD) & Accum) # (!(CMP # TST # HOLD) & MuxOut)) & !LOAD) #
+         (Data & LOAD);
 
 END ALUBlocks
