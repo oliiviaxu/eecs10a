@@ -49,7 +49,8 @@ AdderCarry7                                 node;
 ShiftCarry                                  node;
 ControlOp                                   node;
 FunctionOp                                  node;
-Hold                                        node;     
+Hold                                        node; 
+Subtract                                    node;    
 
 " Buses
 Data = [Data7..Data0];                                  
@@ -94,9 +95,9 @@ StatusRegister INTERFACE       (MuxOut7..MuxOut0,
                                 HOLD,
                                 ControlOp,                     " If we are doing adder (1) or a shift (0)
                                 FunctionOp,
+                                Subtract,
                                 Clock, Reset                     
                                 -> Flags7..Flags0);
-
 
 Accumulator     FUNCTIONAL_BLOCK    ALUBlocks;
 StatusReg  FUNCTIONAL_BLOCK    StatusRegister;
@@ -121,6 +122,9 @@ ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
 
 " Generate FunctionOp (1 for function / logic operations, 0 otherwise)
 FunctionOp = (AND # OR # XOR # NOT # TST);
+
+" Generate Subtract 
+Subtract = (SUB # SBB # DEC # CMP);
 
 " Inputs into the Accumulator
 Accumulator.[Data7..Data0] = [Data7..Data0];
@@ -165,6 +169,7 @@ StatusReg.FunctionOp = FunctionOp;
 StatusReg.Clock = Clock;
 StatusReg.Reset = Reset;
 StatusReg.HOLD = LOAD;
+StatusReg.Subtract = Subtract;
 
 " Extract the flags from the status register
 " The carry flags are active low, so we !StatusReg
