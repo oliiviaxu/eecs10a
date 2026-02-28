@@ -128,7 +128,7 @@ FunctionOp = (AND # OR # XOR # NOT # TST);
 
 " Inputs into the Accumulator
 Accumulator.[Data7..Data0] = [Data7..Data0];
-Accumulator.CarryFlag = CarryFlag;
+Accumulator.CarryFlag = Flags3;
 Accumulator.LSR = LSR;                          
 Accumulator.ASR = ASR;
 Accumulator.ROR = ROR;
