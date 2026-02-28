@@ -98,7 +98,7 @@ B7..B0                                     node;  " One of the inputs into the a
 AdderOutput7..AdderOutput0                 node;  " Output of the adder block that goes into 2:1 mux and Flag calc. 
 ShiftOutput7..ShiftOutput0                 node;  " Output of the shift block that goes into 2:1 mux and Flag calc.
 F7..F0                                     node;  " Output of the FBlock that goes into the adder block
-AdderCarry8..AdderCarry0                           node;
+AdderCarry6..AdderCarry0                           node;
 
 " Buses
 Data = [Data7..Data0];                                      " 8 bits of operand B
