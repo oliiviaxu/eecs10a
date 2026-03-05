@@ -22,13 +22,7 @@ TITLE      'Data Address Unit Unit Demo'
 
 
 " Revision History:
-" 02/06/18   Glen George  Initial Revision
-" 02/14/18   Glen George  Fixed some typos
-" 02/14/18   Glen George  Specialized for Data Memory Access Unit
-" 01/08/20   Glen George  Updated comments
-" 01/04/21   Glen George  Updated comments
-
-
+" 03/04/26   Olivia Xu  Initial Revision
 
 " Pin/Signal Declarations
 
@@ -117,11 +111,11 @@ DAUnit.[Offset7..Offset0]  =  [DataOff7..DataOff0];
 DAUnit.Inc = Control0;
 DAUnit.Dec = Control1;
 DAUnit.OffsetEn = Control2;     " Offset Enable 
-DAUnit.Sel1 = Control3;         " Source : Offset 
+DAUnit.Sel1 = Control3;         " Source : Offset (m7..m0 in the diagram)
 DAUnit.Sel2 = Control4;         " Source : X Reg
 DAUnit.Sel3 = Control5;         " Source : S Reg
 DAUnit.Sel4 = Control6;         " Source : accumulator 
-DAUnit.Pre = Control7;          " Pre / post 
+DAUnit.Pre = Control7;          " Pre / post control signal 
 
 DAUnit.Reset  =  Reset;
 DAUnit.Clock  =  Clock;

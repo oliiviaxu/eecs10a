@@ -17,18 +17,20 @@ TITLE 'Data Access Unit'
 "              Reset                            - system reset 
 "              Clock                            - system clock 
 "              Inc/Dec                          - Increment or Decrement control signals 
-"              OffsetEn                         - Active high for if offset enabled 
-"              Sel[1..4]                        - One-hot encoded control signals for first mux with m, x, s, a inputs 
-"              Pre                              - Control signal, active high for pre, active low for post 
+"              OffsetEn                         - Active high if offset enabled 
+"              Sel[1..4]                        - One-hot encoded control signals for AddrSrc mux with m, x, s, a inputs 
+"              Pre                              - Control signal: active high for pre, active low for post 
 "
 " Outputs:     DataAddr[7..0]                   - 8 bits of data address 
 "              XReg[7..0]                       - 8 bits of X register 
 "              SReg[7..0]                       - 8 bits of S register 
 
+
 " Revision History:
 " 03/04/26   Olivia Xu  Initial Revision
 " 03/04/26   Olivia Xu  Bug/syntax fixes 
 " 03/04/26   Olivia Xu  Added XLatchEn and SLatchEn 
+" 03/05/26   Olivia Xu  Added comments
 
 " Pin/Signal Declarations
 
@@ -39,11 +41,11 @@ Reset                                       pin;    "input  system reset
 Clock                                       pin;    "input  system clock 
 Inc                                         pin;    "input  control signal for increment, active high if incrementing
 Dec                                         pin;    "input  control signal for decrement, active high if decrementing
-OffsetEn                                    pin;    "input  control signal for offset enable, anded with immediateoffset  
-Sel1                                        pin;    "input  control signal (one hot encoded) for mux1out
-Sel2                                        pin;    "input  control signal (one hot encoded) for mux1out    
-Sel3                                        pin;    "input  control signal (one hot encoded) for mux1out    
-Sel4                                        pin;    "input  control signal (one hot encoded) for mux1out    
+OffsetEn                                    pin;    "input  control signal for offset enable
+Sel1                                        pin;    "input  control signal (one hot encoded) for mux with AddrSrcSel control signal
+Sel2                                        pin;    "input  control signal (one hot encoded) for mux with AddrSrcSel control signal
+Sel3                                        pin;    "input  control signal (one hot encoded) for mux with AddrSrcSel control signal
+Sel4                                        pin;    "input  control signal (one hot encoded) for mux with AddrSrcSel control signal
 Pre                                         pin;    "input  control signal, active high for pre, active low for post    
 
 " Outputs
@@ -53,12 +55,12 @@ SReg7..SReg0                                pin ISTYPE 'REG';         "output  8
 
 " Intermediate Terms
 ImmediateOffset7..ImmediateOffset0                     node;  " Immediate Offset value gated by OffsetEn 
-Mux1Out7..Mux1Out0                                     node;  " Output of Address Source Mux 
+Mux1Out7..Mux1Out0                                     node;  " Output of AddrSrcSel Mux 
 Mux2Out7..Mux2Out0                                     node;  " Output of increment / decrement value mux 
-Mux3Out7..Mux3Out0                                     node;  " Output of pre / post mux 
+Mux3Out7..Mux3Out0                                     node;  " Output of mux with post/pre as control signal 
 FirstAdderCarry8..FirstAdderCarry0                     node;  " Carry bus for first adder
 SecondAdderCarry8..SecondAdderCarry0                   node;  " Carry bus for second adder 
-FirstAdderOutput7..FirstAdderOutput0                   node;  " Output of first adder (adding increment / decrement mux output and address source mux output)
+FirstAdderOutput7..FirstAdderOutput0                   node;  " Output of first adder (adding output of AddrSrcSel mux and output of inc/dec mux)
 XLatchEn                                               node;  " Controls whether we are updating the x register 
 SLatchEn                                               node;  " Controls whether we are updating the s register 
 
@@ -67,9 +69,9 @@ Offset = [Offset7..Offset0];                                  " 8 bits of offset
 Accum = [Accum7..Accum0];                                     " 8 bits of accumulator
 XReg = [XReg7..XReg0];			                              " 8 bits of x register 
 SReg = [SReg7..SReg0];                                        " 8 bits of s register 
-Mux1Out = [Mux1Out7..Mux1Out0];                               " Output of address source mux 
+Mux1Out = [Mux1Out7..Mux1Out0];                               " Output of AddrSrcSel Mux
 Mux2Out = [Mux2Out7..Mux2Out0];                               " Output of increment / decrement value mux
-Mux3Out = [Mux3Out7..Mux3Out0];                               " Output of pre / post mux 
+Mux3Out = [Mux3Out7..Mux3Out0];                               " Output of mux with post/pre as control signal 
 FirstAdderCarry = [FirstAdderCarry8..FirstAdderCarry0];       " Carry bus for first adder 
 SecondAdderCarry = [SecondAdderCarry8..SecondAdderCarry0];    " Carry bus for second adder 
 DataAddr = [DataAddr7..DataAddr0];                            " 8 bits of data address bus 
@@ -83,27 +85,28 @@ SReg.CLR = !Reset;
 XReg.CLK = Clock;
 XReg.CLR = !Reset;
 
-" Implementation of the mux with m, x, s, and a input (AddrSrcSel)
-Mux1Out = (Offset & Sel1) #                                         " TODO: what is m?     
+" Implementation of mux with m, x, s, and a as inputs (with AddrSrcSel as control signal in diagram)
+Mux1Out = (Offset & Sel1) #                                         
         (XReg & Sel2) #          
         (SReg & Sel3) #          
         (Accum & Sel4);
 
 " Implementation of the mux with 0, 1, and -1 as inputs (IncDecSel)
-Mux2Out = (0 & (!Inc & !Dec)) #                                   
-          ([0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #
-          ([1, 1, 1, 1, 1, 1, 1, 1] & !Inc & Dec);
+
+Mux2Out = (0 & (!Inc & !Dec)) #                                 " If not incrementing or decrementing, select 0          
+          ([0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #             " If incrementing
+          ([1, 1, 1, 1, 1, 1, 1, 1] & !Inc & Dec);              " If decrementing
 
 " Perform addition of Mux1Out and Mux2Out 
 FirstAdderCarry0 = 0;                         
 [FirstAdderCarry8..FirstAdderCarry1] = (Mux1Out & Mux2Out) # ([FirstAdderCarry7..FirstAdderCarry0] & (Mux1Out $ Mux2Out));                
 FirstAdderOutput = Mux1Out $ Mux2Out $ [FirstAdderCarry7..FirstAdderCarry0]; 
 
-" Implementation of the mux with AdderOutput and Mux1out as inputs (pre / post mux)
-Mux3Out = (FirstAdderOutput & Pre) #                                   
-          (Mux1Out & !Pre);
+" Implementation of the mux with AdderOutput and Mux1out as inputs (mux with pre / post control signal)
+Mux3Out = (FirstAdderOutput & Pre) #                                   " If Pre, select FirstAdderOutput 
+          (Mux1Out & !Pre);                                            " If not Pre (post), select output of AddrSrcSel mux (mux1out)
 
-" Only apply offset if OffsetEn is active high 
+" Only pass through immediate offset if OffsetEn is active high 
 ImmediateOffset = Offset & OffsetEn;
 
 " Perform addition of Mux3Out (pre / post mux) and ImmediateOffset 
@@ -111,7 +114,7 @@ SecondAdderCarry0 = 0;
 [SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
 DataAddr = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
-" Update the X or S register only when it is selected as the source address and is being incremented/decremented
+" Update the X or S register only when it is selected as the src address and is being incremented/decremented
 XLatchEn = (Sel2 & (Inc # Dec)); 
 SLatchEn = (Sel3 & (Inc # Dec)); 
 
