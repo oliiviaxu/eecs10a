@@ -3,7 +3,7 @@ MODULE      DataAccess
 INTERFACE  (Accum7..Accum0, Offset7..Offset0,
             Inc, Dec, 
             OffsetEn,
-            Sel1, Sel2, Sel3, Sel4                  
+            Sel1, Sel2, Sel3, Sel4,                  
             Pre,
             Reset, Clock
             -> DataAddr7..DataAddr0, XReg7..XReg0, SReg7..SReg0);
