@@ -46,7 +46,7 @@ Sel4                                        pin;
 Pre                                         pin;    
 
 " Outputs
-DataAddr7..DataAddr0                        pin;
+DataAddr7..DataAddr0                        pin ISTYPE 'REG';
 XReg7..XReg0                                pin ISTYPE 'REG';
 SReg7..SReg0                                pin ISTYPE 'REG';
 
@@ -78,22 +78,26 @@ SReg.CLR = !Reset;
 XReg.CLK = Clock;
 XReg.CLR = !Reset;
 
+" Implementation of the mux with m, x, s, and a input (AddrSrcSel)
 Mux1Out = (Offset & Sel1) #                                         " TODO: what is m?     
         (XReg & Sel2) #          
         (SReg & Sel3) #          
         (Accum & Sel4);
 
+" Implementation of the mux with 0, 1, and -1 as inputs (IncDecSel)
 Mux2Out = (0 & (!Inc & !Dec)) #                                   
           ([0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #
           (1 & !Inc & Dec);
 
+" Perform addition of Mux1Out and Mux2Out 
 AdderCarry0 = 0;                         
 
 [AdderCarry8..AdderCarry1] = (Mux1Out & Mux2Out) # ([AdderCarry7..AdderCarry0] & (Mux1Out $ Mux2Out));                " From HW4 and same as HW6 logic
 AdderOutput = Mux1Out $ Mux2Out $ [AdderCarry7..AdderCarry0]; 
 
-Mux3Out = ( AdderOutput & Pre) #                                   
-          ( Mux1Out & !Pre );
+" Implementation of the mux with AdderOutput and Mux1out as inputs 
+Mux3Out = (AdderOutput & Pre) #                                   
+          (Mux1Out & !Pre );
 
 ImmediateOffset = Offset & OffsetEn;
 
