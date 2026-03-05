@@ -114,6 +114,14 @@ DAUnit.[Offset7..Offset0]  =  [DataOff7..DataOff0];
 
 " connect each Data Memory Access Unit control signal or bus to a subset of
 "    Control29..Control0
+DAUnit.Inc = Control0;
+DAUnit.Dec = Control1;
+DAUnit.OffsetEn = Control2;
+DAUnit.Sel1 = Control3;
+DAUnit.Sel2 = Control4;
+DAUnit.Sel3 = Control5;
+DAUnit.Sel4 = Control6;
+DAUnit.Pre = Control7;
 
 DAUnit.Reset  =  Reset;
 DAUnit.Clock  =  Clock;

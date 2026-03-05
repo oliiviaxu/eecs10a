@@ -75,7 +75,7 @@ SReg.CLR = !Reset;
 XReg.CLK = Clock;
 XReg.CLR = !Reset;
 
-Mux1Out  =  ( & Sel1) #      " TODO: what is m?     
+Mux1Out  =  ( & Sel1) #                                         " TODO: what is m?     
             ([XReg7..XReg0] & Sel2) #          
             ([SReg7..SReg0] & Sel3) #          
             ([Accum7..Accum0] & Sel4);
