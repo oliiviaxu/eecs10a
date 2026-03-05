@@ -82,7 +82,7 @@ Mux1Out  =  (Offset & Sel1) #                                         " TODO: wh
             (SReg & Sel3) #          
             (Accum & Sel4);
 
-Mux2Out = (0 & !Inc & !Dec) #                                   
+Mux2Out = (0 & (!Inc & !Dec)) #                                   
           ([0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #
           (1 & !Inc & Dec);
 
