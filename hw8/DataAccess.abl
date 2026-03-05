@@ -57,7 +57,8 @@ Mux2Out7..Mux2Out0                                     node;
 Mux3Out7..Mux3Out0                                     node;  
 FirstAdderCarry8..FirstAdderCarry0                     node;
 SecondAdderCarry8..SecondAdderCarry0                   node;
-AdderOutput7..AdderOutput0                             node;
+FirstAdderOutput7..FirstAdderOutput0                             node;
+SecondAdderOutput7..SecondAdderOutput0                             node;
 
 " Buses
 Offset = [Offset7..Offset0];           
@@ -70,7 +71,8 @@ Mux3Out = [Mux3Out7..Mux3Out0];
 FirstAdderCarry = [FirstAdderCarry8..FirstAdderCarry0];
 SecondAdderCarry = [SecondAdderCarry8..SecondAdderCarry0];
 DataAddr = [DataAddr7..DataAddr0];
-AdderOutput = [AdderOutput7..AdderOutput0];
+FirstAdderOutput = [FirstAdderOutput7..FirstAdderOutput0];
+SecondAdderOutput = [SecondAdderOutput7..SecondAdderOutput0];
 ImmediateOffset = [ImmediateOffset7..ImmediateOffset0];
 
 EQUATIONS
@@ -79,8 +81,6 @@ SReg.CLK = Clock;
 SReg.CLR = !Reset;
 XReg.CLK = Clock;
 XReg.CLR = !Reset;
-DataAddr.CLK = Clock;
-DataAddr.CLR = !Reset;
 
 " Implementation of the mux with m, x, s, and a input (AddrSrcSel)
 Mux1Out = (Offset & Sel1) #                                         " TODO: what is m?     
@@ -109,7 +109,7 @@ SecondAdderCarry0 = 0
 [SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
 SecondAdderOutput = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
-DataAddr = AdderOutput;
+DataAddr = SecondAdderOutput;
 
 XReg := XReg;
 SReg := SReg;
