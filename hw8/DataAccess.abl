@@ -69,6 +69,7 @@ Mux3Out = [Mux3Out7..Mux3Out0];
 AdderCarry = [AdderCarry8..AdderCarry0];
 DataAddr = [DataAddr7..DataAddr0];
 AdderOutput = [AdderOutput7..AdderOutput0];
+ImmediateOffset = [ImmediateOffset7..ImmediateOffset0];
 
 EQUATIONS
 
