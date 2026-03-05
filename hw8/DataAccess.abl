@@ -77,6 +77,8 @@ SReg.CLK = Clock;
 SReg.CLR = !Reset;
 XReg.CLK = Clock;
 XReg.CLR = !Reset;
+DataAddr.CLK = Clock;
+DataAddr.CLR = !Reset;
 
 " Implementation of the mux with m, x, s, and a input (AddrSrcSel)
 Mux1Out = (Offset & Sel1) #                                         " TODO: what is m?     
