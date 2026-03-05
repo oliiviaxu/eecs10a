@@ -109,8 +109,8 @@ SecondAdderCarry0 = 0;
 [SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
 DataAddr = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
-XLatchEn = Inc # Dec; 
-SLatchEn = Inc # Dec; 
+XLatchEn = Sel2 & (Inc # Dec); 
+SLatchEn = Sel3 & (Inc # Dec); 
 
 XReg := (XReg & !XLatchEn) # (FirstAdderOutput & XLatchEn);
 
