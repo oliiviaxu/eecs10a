@@ -56,6 +56,7 @@ Mux1Out7..Mux1Out0                                     node;
 Mux2Out7..Mux2Out0                                     node;  
 Mux3Out7..Mux3Out0                                     node;  
 AdderCarry8..AdderCarry0                               node;
+AdderOutput7..AdderOutput0                             node;
 
 " Buses
 Offset = [Offset7..Offset0];           
@@ -67,6 +68,7 @@ Mux2Out = [Mux2Out7..Mux2Out0];
 Mux3Out = [Mux3Out7..Mux3Out0];
 AdderCarry = [AdderCarry8..AdderCarry0];
 DataAddr = [DataAddr7..DataAddr0];
+AdderOutput = [AdderOutput7..AdderOutput0]';
 
 EQUATIONS
 
