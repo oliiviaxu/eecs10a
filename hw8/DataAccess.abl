@@ -46,7 +46,7 @@ Sel4                                        pin;
 Pre                                         pin;    
 
 " Outputs
-DataAddr7..DataAddr0                        pin ISTYPE 'REG';
+DataAddr7..DataAddr0                        pin;
 XReg7..XReg0                                pin ISTYPE 'REG';
 SReg7..SReg0                                pin ISTYPE 'REG';
 
@@ -55,7 +55,8 @@ ImmediateOffset7..ImmediateOffset0                     node;
 Mux1Out7..Mux1Out0                                     node;  
 Mux2Out7..Mux2Out0                                     node;  
 Mux3Out7..Mux3Out0                                     node;  
-AdderCarry8..AdderCarry0                               node;
+FirstAdderCarry8..FirstAdderCarry0                     node;
+SecondAdderCarry8..SecondAdderCarry0                   node;
 AdderOutput7..AdderOutput0                             node;
 
 " Buses
@@ -66,7 +67,8 @@ SReg = [SReg7..SReg0];
 Mux1Out = [Mux1Out7..Mux1Out0];
 Mux2Out = [Mux2Out7..Mux2Out0];
 Mux3Out = [Mux3Out7..Mux3Out0];
-AdderCarry = [AdderCarry8..AdderCarry0];
+FirstAdderCarry = [FirstAdderCarry8..FirstAdderCarry0];
+SecondAdderCarry = [SecondAdderCarry8..SecondAdderCarry0];
 DataAddr = [DataAddr7..DataAddr0];
 AdderOutput = [AdderOutput7..AdderOutput0];
 ImmediateOffset = [ImmediateOffset7..ImmediateOffset0];
@@ -89,22 +91,23 @@ Mux1Out = (Offset & Sel1) #                                         " TODO: what
 " Implementation of the mux with 0, 1, and -1 as inputs (IncDecSel)
 Mux2Out = (0 & (!Inc & !Dec)) #                                   
           ([0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #
-          (1 & !Inc & Dec);
+          ([1, 1, 1, 1, 1, 1, 1, 1] & !Inc & Dec);
 
 " Perform addition of Mux1Out and Mux2Out 
-AdderCarry0 = 0;                         
+FirstAdderCarry0 = 0;                         
 
-[AdderCarry8..AdderCarry1] = (Mux1Out & Mux2Out) # ([AdderCarry7..AdderCarry0] & (Mux1Out $ Mux2Out));                " From HW4 and same as HW6 logic
-AdderOutput = Mux1Out $ Mux2Out $ [AdderCarry7..AdderCarry0]; 
+[FirstAdderCarry8..FirstAdderCarry1] = (Mux1Out & Mux2Out) # ([FirstAdderCarry7..FirstAdderCarry0] & (Mux1Out $ Mux2Out));                
+FirstAdderOutput = Mux1Out $ Mux2Out $ [FirstAdderCarry7..FirstAdderCarry0]; 
 
 " Implementation of the mux with AdderOutput and Mux1out as inputs 
-Mux3Out = (AdderOutput & Pre) #                                   
+Mux3Out = (FirstAdderOutput & Pre) #                                   
           (Mux1Out & !Pre );
 
 ImmediateOffset = Offset & OffsetEn;
 
-[AdderCarry8..AdderCarry1] = (Mux3Out & ImmediateOffset) # ([AdderCarry7..AdderCarry0] & (Mux3Out $ ImmediateOffset));                " From HW4 and same as HW6 logic
-AdderOutput = Mux3Out $ ImmediateOffset $ [AdderCarry7..AdderCarry0]; 
+SecondAdderCarry0 = 0
+[SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
+SecondAdderOutput = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
 DataAddr = AdderOutput;
 
