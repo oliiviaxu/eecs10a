@@ -75,7 +75,7 @@ Mux3Out = [Mux3Out7..Mux3Out0];                               " Output of mux wi
 FirstAdderCarry = [FirstAdderCarry8..FirstAdderCarry0];       " Carry bus for first adder 
 SecondAdderCarry = [SecondAdderCarry8..SecondAdderCarry0];    " Carry bus for second adder 
 DataAddr = [DataAddr7..DataAddr0];                            " 8 bits of data address bus 
-FirstAdderOutput = [FirstAdderOutput7..FirstAdderOutput0];    " Output of first adder that adds increment / decrement mux output and address source mux output 
+FirstAdderOutput = [FirstAdderOutput7..FirstAdderOutput0];    " Output of first adder that adds inc / dec mux output and AddrSrcSel mux output 
 ImmediateOffset = [ImmediateOffset7..ImmediateOffset0];       " Immediate offset value gated by OffsetEn 
 
 EQUATIONS
@@ -91,7 +91,7 @@ Mux1Out = (Offset & Sel1) #
         (SReg & Sel3) #          
         (Accum & Sel4);
 
-" Implementation of the mux with 0, 1, and -1 as inputs (IncDecSel)
+" Implementation of the mux with 0, 1, and -1 as inputs (with IncDecSel as control signal in diagram)
 
 Mux2Out = (0 & (!Inc & !Dec)) #                                 " If not incrementing or decrementing, select 0          
           ([0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #             " If incrementing
