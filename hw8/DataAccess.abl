@@ -51,7 +51,7 @@ XReg7..XReg0                                pin ISTYPE 'REG';
 SReg7..SReg0                                pin ISTYPE 'REG';
 
 " Intermediate Terms
-ImmediateOffset                                        node;  
+ImmediateOffset7..ImmediateOffset0                     node;  
 Mux1Out7..Mux1Out0                                     node;  
 Mux2Out7..Mux2Out0                                     node;  
 Mux3Out7..Mux3Out0                                     node;  
