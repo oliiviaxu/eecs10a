@@ -68,7 +68,7 @@ Mux2Out = [Mux2Out7..Mux2Out0];
 Mux3Out = [Mux3Out7..Mux3Out0];
 AdderCarry = [AdderCarry8..AdderCarry0];
 DataAddr = [DataAddr7..DataAddr0];
-AdderOutput = [AdderOutput7..AdderOutput0]';
+AdderOutput = [AdderOutput7..AdderOutput0];
 
 EQUATIONS
 
@@ -77,10 +77,10 @@ SReg.CLR = !Reset;
 XReg.CLK = Clock;
 XReg.CLR = !Reset;
 
-Mux1Out  =  (Offset & Sel1) #                                         " TODO: what is m?     
-            (XReg & Sel2) #          
-            (SReg & Sel3) #          
-            (Accum & Sel4);
+Mux1Out = (Offset & Sel1) #                                         " TODO: what is m?     
+        (XReg & Sel2) #          
+        (SReg & Sel3) #          
+        (Accum & Sel4);
 
 Mux2Out = (0 & (!Inc & !Dec)) #                                   
           ([0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #
