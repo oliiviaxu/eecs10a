@@ -105,7 +105,7 @@ Mux3Out = (FirstAdderOutput & Pre) #
 
 ImmediateOffset = Offset & OffsetEn;
 
-SecondAdderCarry0 = 0
+SecondAdderCarry0 = 0;
 [SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
 SecondAdderOutput = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
