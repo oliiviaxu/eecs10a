@@ -75,10 +75,10 @@ SReg.CLR = !Reset;
 XReg.CLK = Clock;
 XReg.CLR = !Reset;
 
-Mux1Out  =  ( & Sel1) #                                         " TODO: what is m?     
-            ([XReg7..XReg0] & Sel2) #          
-            ([SReg7..SReg0] & Sel3) #          
-            ([Accum7..Accum0] & Sel4);
+Mux1Out  =  (Offset & Sel1) #                                         " TODO: what is m?     
+            (XReg & Sel2) #          
+            (SReg & Sel3) #          
+            (Accum & Sel4);
 
 Mux2Out = ( 0 & !Inc & !Dec) #                                   " Inc = 0, Dec = 0 -> add 0 
           ( [0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #           " Inc = 1, Dec = 0 -> add 1
