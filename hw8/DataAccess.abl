@@ -57,8 +57,8 @@ Mux2Out7..Mux2Out0                                     node;
 Mux3Out7..Mux3Out0                                     node;  
 FirstAdderCarry8..FirstAdderCarry0                     node;
 SecondAdderCarry8..SecondAdderCarry0                   node;
-FirstAdderOutput7..FirstAdderOutput0                             node;
-SecondAdderOutput7..SecondAdderOutput0                             node;
+FirstAdderOutput7..FirstAdderOutput0                   node;
+SecondAdderOutput7..SecondAdderOutput0                 node;
 
 " Buses
 Offset = [Offset7..Offset0];           
@@ -101,7 +101,7 @@ FirstAdderOutput = Mux1Out $ Mux2Out $ [FirstAdderCarry7..FirstAdderCarry0];
 
 " Implementation of the mux with AdderOutput and Mux1out as inputs 
 Mux3Out = (FirstAdderOutput & Pre) #                                   
-          (Mux1Out & !Pre );
+          (Mux1Out & !Pre);
 
 ImmediateOffset = Offset & OffsetEn;
 
@@ -109,7 +109,7 @@ SecondAdderCarry0 = 0;
 [SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
 SecondAdderOutput = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
-DataAddr = SecondAdderOutput;
+DataAddr = Mux2Out;
 
 XReg := XReg;
 SReg := SReg;
