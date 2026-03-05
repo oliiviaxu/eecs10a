@@ -107,7 +107,7 @@ SecondAdderCarry0 = 0;
 [SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
 " DataAddr = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
-DataAddr = FirstAdderOutput;
+DataAddr = Mux3Out;
 
 XReg := XReg;
 SReg := SReg;
