@@ -1,0 +1,105 @@
+MODULE      DataAccess 
+
+INTERFACE  (Accum7..Accum0, Offset7..Offset0,
+            Inc, Dec, 
+            OffsetEn,
+            Sel1, Sel2, Sel3, Sel4                  
+            Pre,
+            Reset, Clock
+            -> DataAddr7..DataAddr0, XReg7..XReg0, SReg7..SReg0);
+
+TITLE 'Data Access Unit'
+
+" Description: This module computes the Data Memory addresses (DataAddr). 
+"
+" Inputs:      Accum[7..0]   
+"              Offset[7..0]  
+"              Reset         
+"              Clock         
+"              Inc/Dec       
+"              OffsetEn      
+"              Sel[1..4]     
+"              Pre           
+"
+" Outputs:     DataAddr[7..0] 
+"              XReg[7..0]     
+"              SReg[7..0]     
+
+" Revision History:
+" 03/04/26   Olivia Xu  Initial Revision
+" TODO 
+
+" Pin/Signal Declarations
+
+" Inputs 
+Accum7..Accum0                              pin;
+Offset7..Offset0                            pin;
+Reset                                       pin;
+Clock                                       pin;
+Inc                                         pin;
+Dec                                         pin;
+OffsetEn                                    pin;
+Sel1                                        pin;
+Sel2                                        pin;    
+Sel3                                        pin;    
+Sel4                                        pin;    
+Pre                                         pin;    
+
+" Outputs
+DataAddr7..DataAddr0                        pin;
+XReg7..XReg0                                pin ISTYPE 'REG';
+SReg7..SReg0                                pin ISTYPE 'REG';
+
+" Intermediate Terms
+ImmediateOffset                                        node;  
+Mux1Out7..Mux1Out0                                     node;  
+Mux2Out7..Mux2Out0                                     node;  
+Mux3Out7..Mux3Out0                                     node;  
+AdderCarry8..AdderCarry0                               node;
+
+" Buses
+Offset = [Offset7..Offset0];           
+Accum = [Accum7..Accum0];
+XReg = [XReg7..XReg0];			
+SReg = [SReg7..SReg0];
+Mux1Out = [Mux1Out7..Mux1Out0];
+Mux2Out = [Mux2Out7..Mux2Out0];
+Mux3Out = [Mux3Out7..Mux3Out0];
+AdderCarry = [AdderCarry8..AdderCarry0];
+DataAddr = [DataAddr7..DataAddr0];
+
+EQUATIONS
+
+SReg.CLK = Clock;
+SReg.CLR = !Reset;
+XReg.CLK = Clock;
+XReg.CLR = !Reset;
+
+Mux1Out  =  ( & Sel1) #      " TODO: what is m?     
+            ([XReg7..XReg0] & Sel2) #          
+            ([SReg7..SReg0] & Sel3) #          
+            ([Accum7..Accum0] & Sel4);
+
+Mux2Out = ( 0 & !Inc & !Dec) #                                   " Inc = 0, Dec = 0 -> add 0 
+          ( [0, 0, 0, 0, 0, 0, 0, 1] & Inc & !Dec) #           " Inc = 1, Dec = 0 -> add 1
+          ( 1 & !Inc & Dec);                                   " Inc = 0, Dec = 1 -> dec 1
+
+AdderCarry0 = 0;                         
+
+[AdderCarry8..AdderCarry1] = (Mux1Out & Mux2Out) # ([AdderCarry7..AdderCarry0] & (Mux1Out $ Mux2Out));                " From HW4 and same as HW6 logic
+AdderOutput = Mux1Out $ Mux2Out $ [AdderCarry7..AdderCarry0]; 
+
+Mux3Out = ( AdderOutput & Pre) #                                   
+          ( Mux1Out & !Pre );
+
+ImmediateOffset = Offset & OffsetEn;
+
+[AdderCarry8..AdderCarry1] = (Mux3Out & ImmediateOffset) # ([AdderCarry7..AdderCarry0] & (Mux3Out $ ImmediateOffset));                " From HW4 and same as HW6 logic
+AdderOutput = Mux3Out $ ImmediateOffset $ [AdderCarry7..AdderCarry0]; 
+
+DataAddr = AdderOutput;
+
+XReg := XReg;
+SReg := SReg;
+
+END DataAccess
