@@ -102,7 +102,7 @@ FirstAdderCarry0 = 0;
 [FirstAdderCarry8..FirstAdderCarry1] = (Mux1Out & Mux2Out) # ([FirstAdderCarry7..FirstAdderCarry0] & (Mux1Out $ Mux2Out));                
 FirstAdderOutput = Mux1Out $ Mux2Out $ [FirstAdderCarry7..FirstAdderCarry0]; 
 
-" Implementation of the mux with AdderOutput and Mux1out as inputs (mux with pre / post control signal)
+" Implementation of the mux (with pre / post control signal) and FirstAdderOutput and Mux1out as inputs 
 Mux3Out = (FirstAdderOutput & Pre) #                                   " If Pre, select FirstAdderOutput 
           (Mux1Out & !Pre);                                            " If not Pre (post), select output of AddrSrcSel mux (mux1out)
 
