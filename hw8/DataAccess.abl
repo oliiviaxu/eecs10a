@@ -95,7 +95,6 @@ Mux2Out = (0 & (!Inc & !Dec)) #
 
 " Perform addition of Mux1Out and Mux2Out 
 FirstAdderCarry0 = 0;                         
-
 [FirstAdderCarry8..FirstAdderCarry1] = (Mux1Out & Mux2Out) # ([FirstAdderCarry7..FirstAdderCarry0] & (Mux1Out $ Mux2Out));                
 FirstAdderOutput = Mux1Out $ Mux2Out $ [FirstAdderCarry7..FirstAdderCarry0]; 
 
@@ -109,8 +108,8 @@ SecondAdderCarry0 = 0;
 [SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
 DataAddr = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
-XLatchEn = Sel2 & (Inc # Dec); 
-SLatchEn = Sel3 & (Inc # Dec); 
+XLatchEn = (Sel2 & (Inc # Dec)); 
+SLatchEn = (Sel3 & (Inc # Dec)); 
 
 XReg := (XReg & !XLatchEn) # (FirstAdderOutput & XLatchEn);
 
