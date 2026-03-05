@@ -87,12 +87,12 @@ SReg       =  [SReg7..SReg0];			"8 bit S-Register
 " declare the unit to be tested
 
 DataAccess INTERFACE  (Accum7..Accum0, Offset7..Offset0,
-                        Inc, Dec, 
-                        OffsetEn,
-                        Sel1, Sel2, Sel3, Sel4                  
-                        Pre,
-                        Reset, Clock
-                        -> DataAddr7..DataAddr0, XReg7..XReg0, SReg7..SReg0);
+            Inc, Dec, 
+            OffsetEn,
+            Sel1, Sel2, Sel3, Sel4                  
+            Pre,
+            Reset, Clock
+            -> DataAddr7..DataAddr0, XReg7..XReg0, SReg7..SReg0);
 
 " create an instance of the unit to be tested
 
