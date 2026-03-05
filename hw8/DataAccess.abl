@@ -58,6 +58,8 @@ Mux3Out7..Mux3Out0                                     node;
 FirstAdderCarry8..FirstAdderCarry0                     node;
 SecondAdderCarry8..SecondAdderCarry0                   node;
 FirstAdderOutput7..FirstAdderOutput0                   node;
+XLatchEn                                               node;
+SLatchEn                                               node;
 
 " Buses
 Offset = [Offset7..Offset0];           
@@ -107,7 +109,11 @@ SecondAdderCarry0 = 0;
 [SecondAdderCarry8..SecondAdderCarry1] = (Mux3Out & ImmediateOffset) # ([SecondAdderCarry7..SecondAdderCarry0] & (Mux3Out $ ImmediateOffset));                
 DataAddr = Mux3Out $ ImmediateOffset $ [SecondAdderCarry7..SecondAdderCarry0]; 
 
-XReg := XReg;
-SReg := SReg;
+XLatchEn = FirstAdderOutput & (Inc # Dec); 
+SLatchEn = FirstAdderOutput & (Inc # Dec); 
+
+XReg := (XReg & !XLatchEn) # (FirstAdderOutput & XLatchEn);
+
+SReg := (SReg & !SLatchEn) # (FirstAdderOutput & SLatchEn);
 
 END DataAccess

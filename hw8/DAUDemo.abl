@@ -117,10 +117,10 @@ DAUnit.[Offset7..Offset0]  =  [DataOff7..DataOff0];
 DAUnit.Inc = Control0;
 DAUnit.Dec = Control1;
 DAUnit.OffsetEn = Control2;
-DAUnit.Sel1 = Control3;
-DAUnit.Sel2 = Control4;
-DAUnit.Sel3 = Control5;
-DAUnit.Sel4 = Control6;
+DAUnit.Sel1 = Control3;         " Source : Offset 
+DAUnit.Sel2 = Control4;         " Source : X Reg
+DAUnit.Sel3 = Control5;         " Source : S Reg
+DAUnit.Sel4 = Control6;         " Source : accumulator 
 DAUnit.Pre = Control7;
 
 DAUnit.Reset  =  Reset;
