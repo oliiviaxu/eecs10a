@@ -69,33 +69,29 @@ PAU_Offset = [PAU_Offset7..PAU_Offset0];        " 8 bits of offset passed to PAU
 
 " ALUnit 
 
-" ALU_CTRL = [POP, LOAD, ASL, RLC, ROL, RRC, ROR, ASR, LSR, TST, NOT, XOR, OR, AND, DEC, INC, CMP, SBB, SUB, ADC, ADD];
-
-ALU_CTRL_ADD  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]; " Control0
-ALU_CTRL_ADC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]; " Control1
-ALU_CTRL_SUB  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]; " Control2
-ALU_CTRL_SBB  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]; " Control3
-ALU_CTRL_CMP  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]; " Control4
-ALU_CTRL_INC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]; " Control5
-ALU_CTRL_DEC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]; " Control6
-ALU_CTRL_AND  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]; " Control7
-ALU_CTRL_OR   = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]; " Control8
-ALU_CTRL_XOR  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control9
-ALU_CTRL_NOT  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control10
-ALU_CTRL_TST  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control11
-ALU_CTRL_LSR  = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control12
-ALU_CTRL_ASR  = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control13
-ALU_CTRL_ROR  = [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control14
-ALU_CTRL_RRC  = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control15
-ALU_CTRL_ROL  = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control16
-ALU_CTRL_RLC  = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control17
-ALU_CTRL_ASL  = [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control18
-ALU_CTRL_LOAD = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control19
-ALU_CTRL_POP  = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control20
+ALU_CTRL_ADD  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]; 
+ALU_CTRL_ADC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]; 
+ALU_CTRL_SUB  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]; 
+ALU_CTRL_SBB  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]; 
+ALU_CTRL_CMP  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]; 
+ALU_CTRL_INC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]; 
+ALU_CTRL_DEC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_AND  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_OR   = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_XOR  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_NOT  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_TST  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_LSR  = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_ASR  = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_ROR  = [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_RRC  = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_ROL  = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_RLC  = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_ASL  = [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_LOAD = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
+ALU_CTRL_POP  = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
 
 " PAUnit
-
-" PAU_CTRL = [RTS2, RTS1, RelativeAddressing, Absolute, Increment];
 
 PAU_INC      = [0, 0, 0, 0, 1];
 PAU_ABSOLUTE = [0, 0, 0, 1, 0];
@@ -104,8 +100,6 @@ PAU_RTS_LOW  = [0, 1, 0, 0, 0];
 PAU_RTS_HIGH = [1, 0, 0, 0, 0];
 
 " DAUnit 
-
-" DAU_CTRL = [Pre, Sel4, Sel3, Sel2, Sel1, OffsetEn, Dec, Inc];
 
 DAU_INC      = [0, 0, 0, 0, 0, 0, 0, 1]; " Increment (Control0)
 DAU_DEC      = [0, 0, 0, 0, 0, 0, 1, 0]; " Decrement (Control1)
@@ -120,8 +114,14 @@ DAU_PRE      = [1, 0, 0, 0, 0, 0, 0, 0]; " Pre (Control7)
 DAU_XOFF    = [0, 0, 0, 1, 0, 1, 0, 0]; " X Reg + Offset 
 DAU_SOFF    = [0, 0, 1, 0, 0, 1, 0, 0]; " S Reg + Offset 
 
+" ALU source: either the databus or the instruction register 
 ALU_SRC_DB = [1, 0];
 ALU_SRC_IR = [0, 1];
+
+" Data data bus source: 
+DDB_SRC_ACCUM = [0, 0, 0, 1];                
+DDB_SRC_FLAGS = [0, 0, 1, 0];                
+DDB_SRC_PC    = [0, 1, 0, 0];                
 
 EQUATIONS
 
@@ -131,14 +131,14 @@ IR.CLR = !Reset;
 IR := ProgramDB;
 
 
-" ADC - Adds accumulator, m, carry flag 
+" ADC: Adds accumulator, m, carry flag 
 WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 0]) THEN {
     ALU_CTRL = ALU_CTRL_ADC;
     PAU_CTRL = PAU_INC;
     DAU_CTRL = DAU_SEL_OFF;
     ALU_Source = ALU_SRC_DB;
     PAU_Offset = .X.;
-    DDB_Source = .X.;
+    DDB_Source = DDB_SRC_ACCUM;
     RD = 1;
     WR = 0;
     IO = 0;

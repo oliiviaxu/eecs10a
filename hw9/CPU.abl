@@ -126,6 +126,8 @@ CUnit.[Flags7..Flags0] = [Flags7..Flags0];
 CUnit.Clock = Clock;
 CUnit.Reset = Reset;
 
+" outputs of CUnit 
+" TODO
 RD = CUnit.RD;
 WR = CUnit.WR;
 IO = CUnit.IO;
@@ -160,7 +162,7 @@ ALUnit.POP = CUnit.ALU_CTRL20;
 
 " PAU Inputs 
 PAUnit.[Offset7..Offset0]   =  CUnit.[PAU_Offset7..PAU_Offset0];        " TODO 
-PAUnit.[Direct12..Direct0]  =  CUnit.[IR12..IR0];               " TODO 
+PAUnit.[Direct12..Direct0]  =  CUnit.[IR12..IR0];                       " TODO 
 PAUnit.Increment = CUnit.PAU_CTRL0;
 PAUnit.Absolute = CUnit.PAU_CTRL1;
 PAUnit.RelativeAddressing = CUnit.PAU_CTRL2;
