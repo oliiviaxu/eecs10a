@@ -170,7 +170,7 @@ PAUnit.Reset  =  Reset;
 PAUnit.Clock  =  Clock;
 
 " PAU outputs
-ProgramAB = PAUnit.[ProgAddr12..ProgAddr0];
+[ProgramAB12..ProgramAB0] = PAUnit.[ProgAddr12..ProgAddr0];
 
 " DAU Inputs 
 DAUnit.[Accum7..Accum0] = ALUnit.[Accum7..Accum0];         " TODO 
