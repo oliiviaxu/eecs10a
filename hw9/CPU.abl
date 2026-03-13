@@ -188,7 +188,7 @@ DAUnit.Clock  =  Clock;
 " output enables
 
 " Data data bus is enabled when writing
-DataDB.OE  =  control unit write signal;
+DataDB.OE  =  CUnit.WR;
 
 " most signals are always enabled
 ProgramAB.OE         =  ^h1FFF;
