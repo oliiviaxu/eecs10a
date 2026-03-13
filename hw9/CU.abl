@@ -1,0 +1,204 @@
+MODULE      CU
+INTERFACE  (ProgramDB15..ProgramDB0,
+            Flags7..Flags0, 
+            Reset, Clock 
+            -> IR15..IR0, RD, WR, IO,
+            ALU_CTRL20..ALU_CTRL0, 
+            PAU_CTRL4..PAU_CTRL0, 
+            DAU_CTRL7..DAU_CTRL0, 
+            ALU_Source1, ALU_Source0, 
+            DDB_Source3..DDB_Source0,
+            PAU_Offset7..PAU_Offset0);
+
+TITLE      'Control Unit'
+
+
+" Description:  
+"
+" Inputs:         ProgramDB[15..0]  - the 16-bit program data bus
+"                 Flags[7..0]       - 8 bits of flags 
+"                 Reset             - system reset signal
+"                 Clock             - system clock
+" 
+" Outputs:        
+"                 " TODO 
+"                 RD                - read signal for the data data bus
+"                 WR                - write signal for the data data bus
+"                 IO                - memory (0) or I/O (1) is being accessed
+"
+" Revision History:
+" 03/11/26   Olivia Xu  Initial Revision
+" TODO 
+
+
+" Pin/Signal Declarations
+
+" Inputs
+
+ProgramDB15..ProgramDB0	pin;	"input  16-bit instruction data bus
+Flags7..Flags0          pin;    "input  8 bits of flags
+Reset                   pin;    "input  system reset signal
+Clock                   pin;    "input  system clock
+
+
+" Outputs
+
+IR15..IR0	                pin;	"output  the 16-bit instruction register
+ALU_CTRL20..ALU_CTRL0       pin;    "output  21 control signals into the ALU 
+PAU_CTRL4..PAU_CTRL0        pin;    "output  5 control signals into PAU
+DAU_CTRL7..DAU_CTRL0        pin;    "output  8 control signals into DAU
+ALU_Source1                 pin;    "output  TODO
+ALU_Source0                 pin;    "output  TODO
+PAU_Offset7..PAU_Offset0    pin;    "output  8 bits of offset into PAU
+DDB_Source3..DDB_Source0    pin;    "output  TODO
+RD			                pin;	"output  read signal for the Data data bus
+WR			                pin;	"output  write signal for the Data data bus
+IO			                pin;	"output  accessing memory (0) or I/O (1)
+
+
+" Busses
+IR  =  [IR15..IR0];                             " 16 bit instruction register
+ProgramDB = [ProgramDB15..ProgramDB0];          " 16-bit program data bus  
+ALU_CTRL = [ALU_CTRL20..ALU_CTRL0];             " ALU control signals for each instruction 
+ALU_Source = [ALU_Source1, ALU_Source0];        " TODO: ALU_Source1 is Data data bus, ALU_Source2 is instruction register
+DDB_Source = [DDB_Source3..DDB_Source0];        " TODO 
+PAU_CTRL = [PAU_CTRL4..PAU_CTRL0];              " PAU control signals
+DAU_CTRL = [DAU_CTRL7..DAU_CTRL0];              " DAU control signals 
+PAU_Offset = [PAU_Offset7..PAU_Offset0];        " 8 bits of offset passed to PAU
+
+" Constants
+
+" ALUnit 
+
+" ALU_CTRL = [POP, LOAD, ASL, RLC, ROL, RRC, ROR, ASR, LSR, TST, NOT, XOR, OR, AND, DEC, INC, CMP, SBB, SUB, ADC, ADD];
+
+ALU_CTRL_ADD  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]; " Control0
+ALU_CTRL_ADC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]; " Control1
+ALU_CTRL_SUB  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]; " Control2
+ALU_CTRL_SBB  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]; " Control3
+ALU_CTRL_CMP  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]; " Control4
+ALU_CTRL_INC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]; " Control5
+ALU_CTRL_DEC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]; " Control6
+ALU_CTRL_AND  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]; " Control7
+ALU_CTRL_OR   = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]; " Control8
+ALU_CTRL_XOR  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control9
+ALU_CTRL_NOT  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control10
+ALU_CTRL_TST  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control11
+ALU_CTRL_LSR  = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control12
+ALU_CTRL_ASR  = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control13
+ALU_CTRL_ROR  = [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control14
+ALU_CTRL_RRC  = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control15
+ALU_CTRL_ROL  = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control16
+ALU_CTRL_RLC  = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control17
+ALU_CTRL_ASL  = [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control18
+ALU_CTRL_LOAD = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control19
+ALU_CTRL_POP  = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; " Control20
+
+" PAUnit
+
+" PAU_CTRL = [RTS2, RTS1, RelativeAddressing, Absolute, Increment];
+
+PAU_INC      = [0, 0, 0, 0, 1];
+PAU_ABSOLUTE = [0, 0, 0, 1, 0];
+PAU_RELATIVE = [0, 0, 1, 0, 0];
+PAU_RTS_LOW  = [0, 1, 0, 0, 0];
+PAU_RTS_HIGH = [1, 0, 0, 0, 0];
+
+" DAUnit 
+
+" DAU_CTRL = [Pre, Sel4, Sel3, Sel2, Sel1, OffsetEn, Dec, Inc];
+
+DAU_INC      = [0, 0, 0, 0, 0, 0, 0, 1]; " Increment (Control0)
+DAU_DEC      = [0, 0, 0, 0, 0, 0, 1, 0]; " Decrement (Control1)
+DAU_OFF_EN   = [0, 0, 0, 0, 0, 1, 0, 0]; " Offset Enable (Control2)
+DAU_SEL_OFF  = [0, 0, 0, 0, 1, 0, 0, 0]; " m / offset (Control3)
+DAU_SEL_X    = [0, 0, 0, 1, 0, 0, 0, 0]; " X Reg (Control4)
+DAU_SEL_S    = [0, 0, 1, 0, 0, 0, 0, 0]; " S Reg (Control5)
+DAU_SEL_ACC  = [0, 1, 0, 0, 0, 0, 0, 0]; " Accumulator (Control6)
+DAU_PRE      = [1, 0, 0, 0, 0, 0, 0, 0]; " Pre (Control7)
+
+"TODO: check this
+DAU_XOFF    = [0, 0, 0, 1, 0, 1, 0, 0]; " X Reg + Offset 
+DAU_SOFF    = [0, 0, 1, 0, 0, 1, 0, 0]; " S Reg + Offset 
+
+ALU_SRC_DB = [1, 0];
+ALU_SRC_IR = [0, 1];
+
+EQUATIONS
+
+IR.CLK = Clock;
+IR.CLR = !Reset;
+
+IR := ProgramDB;
+
+
+" ADC - Adds accumulator, m, carry flag 
+WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_ADC;
+    PAU_CTRL = PAU_INC;
+    DAU_CTRL = DAU_SEL_OFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = .X.;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+}
+
+" ADCXO - Adds accumulator, carry flag, and X register and offset 
+WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_ADC;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_XOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = ;
+    DDB_Source = ;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+} 
+
+" ADCSO - Adds accumulator, carry flag, and S register and offset 
+WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_ADC;
+    PAU_CTRL = PAU_INC;
+    DAU_CTRL = DAU_SOFF; 
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = ;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+} 
+
+" ADCI - Adds accumulator, k (lower 8 bits of instruction), and carry flag 
+WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_ADC;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = NOP; "TODO 
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = ;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+}
+
+" TODO: check this 
+" ADD - Adds accumulator and m 
+WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_ADD;
+    PAU_CTRL = PAU_INC;
+    DAU_CTRL = DAU_SEL_OFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = ;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+} 
+
+
+
+
+END CU
