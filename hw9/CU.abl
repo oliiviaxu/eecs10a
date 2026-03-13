@@ -34,8 +34,7 @@ TITLE      'Control Unit'
 " Pin/Signal Declarations
 
 " Inputs
-
-ProgramDB15..ProgramDB0	    pin;	"input  16-bit data bus
+ProgramDB15..ProgramDB0     pin;    "input  16-bit data bus
 Flags7..Flags0              pin;    "input  8 bits of flags
 Reset                       pin;    "input  system reset signal
 Clock                       pin;    "input  system clock
