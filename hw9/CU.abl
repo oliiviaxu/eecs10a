@@ -21,7 +21,7 @@ TITLE      'Control Unit'
 "                 Clock             - system clock
 " 
 " Outputs:        
-"                 " TODO 
+"                 TODO
 "                 RD                - read signal for the data data bus
 "                 WR                - write signal for the data data bus
 "                 IO                - memory (0) or I/O (1) is being accessed
