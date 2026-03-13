@@ -193,6 +193,8 @@ DataAB = DAUnit.[DataAddr7..DataAddr0];
 
 " output enables
 
+DataDB = 0;
+
 " Data data bus is enabled when writing
 DataDB.OE  =  CUnit.WR;
 
