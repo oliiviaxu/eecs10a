@@ -35,25 +35,25 @@ TITLE      'Control Unit'
 
 " Inputs
 
-ProgramDB15..ProgramDB0	pin;	"input  16-bit instruction data bus
-Flags7..Flags0          pin;    "input  8 bits of flags
-Reset                   pin;    "input  system reset signal
-Clock                   pin;    "input  system clock
+ProgramDB15..ProgramDB0	    pin;	"input  16-bit data bus
+Flags7..Flags0              pin;    "input  8 bits of flags
+Reset                       pin;    "input  system reset signal
+Clock                       pin;    "input  system clock
 
 
 " Outputs
 
-IR15..IR0	                pin;	"output  the 16-bit instruction register
-ALU_CTRL20..ALU_CTRL0       pin;    "output  21 control signals into the ALU 
-PAU_CTRL4..PAU_CTRL0        pin;    "output  5 control signals into PAU
-DAU_CTRL7..DAU_CTRL0        pin;    "output  8 control signals into DAU
-ALU_Source1                 pin;    "output  TODO
-ALU_Source0                 pin;    "output  TODO
-PAU_Offset7..PAU_Offset0    pin;    "output  8 bits of offset into PAU
-DDB_Source3..DDB_Source0    pin;    "output  TODO
-RD			                pin;	"output  read signal for the Data data bus
-WR			                pin;	"output  write signal for the Data data bus
-IO			                pin;	"output  accessing memory (0) or I/O (1)
+IR15..IR0                   pin ISTYPE 'REG';	"output  the 16-bit instruction register
+ALU_CTRL20..ALU_CTRL0       pin;                "output  21 control signals into the ALU 
+PAU_CTRL4..PAU_CTRL0        pin;                "output  5 control signals into PAU
+DAU_CTRL7..DAU_CTRL0        pin;                "output  8 control signals into DAU
+ALU_Source1                 pin;                "output  TODO
+ALU_Source0                 pin;                "output  TODO
+PAU_Offset7..PAU_Offset0    pin;                "output  8 bits of offset into PAU
+DDB_Source3..DDB_Source0    pin;                "output  TODO
+RD			                pin;	            "output  read signal for the Data data bus
+WR			                pin;	            "output  write signal for the Data data bus
+IO			                pin;	            "output  accessing memory (0) or I/O (1)
 
 
 " Busses
@@ -144,61 +144,5 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 0]) THEN {
     WR = 0;
     IO = 0;
 }
-
-" ADCXO - Adds accumulator, carry flag, and X register and offset 
-WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 1]) THEN {
-    ALU_CTRL = ALU_CTRL_ADC;
-    PAU_CTRL = PAU_INC; 
-    DAU_CTRL = DAU_XOFF;
-    ALU_Source = ALU_SRC_DB;
-    PAU_Offset = ;
-    DDB_Source = ;
-    RD = 1;
-    WR = 0;
-    IO = 0;
-} 
-
-" ADCSO - Adds accumulator, carry flag, and S register and offset 
-WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 0]) THEN {
-    ALU_CTRL = ALU_CTRL_ADC;
-    PAU_CTRL = PAU_INC;
-    DAU_CTRL = DAU_SOFF; 
-    ALU_Source = ALU_SRC_DB;
-    PAU_Offset = .X.;
-    DDB_Source = ;
-    RD = 1;
-    WR = 0;
-    IO = 0;
-} 
-
-" ADCI - Adds accumulator, k (lower 8 bits of instruction), and carry flag 
-WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 1]) THEN {
-    ALU_CTRL = ALU_CTRL_ADC;
-    PAU_CTRL = PAU_INC; 
-    DAU_CTRL = NOP; "TODO 
-    ALU_Source = ALU_SRC_IR;
-    PAU_Offset = .X.;
-    DDB_Source = ;
-    RD = 1;
-    WR = 0;
-    IO = 0;
-}
-
-" TODO: check this 
-" ADD - Adds accumulator and m 
-WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 0, 0]) THEN {
-    ALU_CTRL = ALU_CTRL_ADD;
-    PAU_CTRL = PAU_INC;
-    DAU_CTRL = DAU_SEL_OFF;
-    ALU_Source = ALU_SRC_DB;
-    PAU_Offset = .X.;
-    DDB_Source = ;
-    RD = 1;
-    WR = 0;
-    IO = 0;
-} 
-
-
-
 
 END CU
