@@ -81,9 +81,9 @@ ImmediateOffset = [ImmediateOffset7..ImmediateOffset0];       " Immediate offset
 EQUATIONS
 
 SReg.CLK = Clock;
-SReg.CLR = !Reset;
+SReg.CLR = Reset;
 XReg.CLK = Clock;
-XReg.CLR = !Reset;
+XReg.CLR = Reset;
 
 " Implementation of mux with m, x, s, and a as inputs (with AddrSrcSel as control signal in diagram)
 Mux1Out = (Offset & Sel1) #                                         

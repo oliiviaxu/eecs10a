@@ -76,7 +76,7 @@ EQUATIONS
 " clocks 
 
 PC.CLK = Clock;
-PC.CLR = !Reset;
+PC.CLR = Reset;
 
 Hold = !(Increment # RelativeAddressing # Absolute # RTS1 # RTS2);
 

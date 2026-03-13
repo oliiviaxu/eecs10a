@@ -128,7 +128,7 @@ DDB_SRC_PC_2 = [1, 0, 0, 0];
 EQUATIONS
 
 IR.CLK = Clock;
-IR.CLR = !Reset;
+IR.CLR = Reset;
 
 IR := ProgramDB;
 

@@ -75,7 +75,7 @@ Data = [Data7..Data0];
 EQUATIONS
 
 Flags.CLK = Clock;
-Flags.CLR = !Reset;
+Flags.CLR = Reset;
 
 " Calculate zero adn sign flags
 Zero = !(MuxOut7 # MuxOut6 # MuxOut5 # MuxOut4 # MuxOut3 # MuxOut2 # MuxOut1 # MuxOut0); 

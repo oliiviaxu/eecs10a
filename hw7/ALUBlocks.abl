@@ -115,7 +115,7 @@ FOp = [FOp3..FOp0];                                         " FBlock control sig
 EQUATIONS
 
 Accum.CLK = Clock;
-Accum.CLR = !Reset;
+Accum.CLR = Reset;
 
 " Shift Equations 
 
