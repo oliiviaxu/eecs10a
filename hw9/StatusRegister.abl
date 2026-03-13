@@ -1,0 +1,97 @@
+MODULE          StatusRegister
+INTERFACE       (MuxOut7..MuxOut0,
+                 Data7..Data0,
+                 AdderCarry8,
+                 AdderCarry7,
+                 ShiftCarry,
+                 POP,
+                 HOLD,
+                 ControlOp,
+                 FunctionOp,
+                 Subtract,
+                 ASL, RLC,
+                 Clock, Reset                     
+                -> Flags7..Flags0);
+
+TITLE           'Status Register'
+
+" Description:   Computes the flags (Zero, Sign, Overflow, Carry). 
+"                Updates on every clock cycle based on the 
+"                ALU's outputs (MuxOut and Carry/ShiftCarry).
+"
+" Inputs:        MuxOut7..MuxOut0               - The 8-bit result from the 2:1 mux
+"                Data7..Data0,                  - 8 bits of operand B
+"                AdderCarry8                    - Carry Out from the afder 
+"                AdderCarry7                    - Carry In from the adder 
+"                ShiftCarry                     - Bit shifted out during shift / rotate ops 
+"                ControlOp                      - 1 = Adding, 0 = Shift 
+"                POP                            - Control signal for POP instruction
+"                HOLD                           - Control signal for HOLD instruction
+"                FunctionOp                     - If we are doing function operation, we don't want to always modify carry and overflow
+"                ASL, RLC                       - active high if we are doing ASL, RLC (control signals)
+"                Subtract                       - Control signal for whether we are doing an operation related to subtraction
+"                Clock                          
+"                Reset 
+" TODO 
+"
+" Outputs:       Flags7..Flags0                 - 8 bits of flag outputs
+"
+" Revision History:
+" 02/26/26   Olivia Xu  Initial Revision
+" 02/27/26   Olivia Xu  Fixed overflow and carry flag to not be affected by every operation
+" 02/28/26   Olivia Xu  Updated comments
+
+" Pin/Signal Declarations
+
+" Inputs 
+MuxOut7..MuxOut0                        pin;        "input  8 bits of ALU result 
+Data7..Data0                            pin;        "input  8 bits of operand B (from the video diagram)
+AdderCarry8                             pin;        "input  Carry out from the adder
+AdderCarry7                             pin;        "input  Carry In from the adder
+ShiftCarry                              pin;        "input  bit shifted out from the shift / rotate ops 
+ControlOp                               pin;        "input  active hgh for adding, active low for shifting
+FunctionOp                              pin;        "input  active high for function / logic ops, active low otherwise
+Subtract                                pin;        "input  control signal for whether we are doing operation related to subtraction (note: different from SUB)
+Clock                                   pin;        "input  system clock
+Reset                                   pin;        "input  system reset
+POP                                     pin;        "input  load flags control signal
+HOLD                                    pin;        "input  control signal for holding value in accumulator
+ASL                                     pin;        "input  control signal for ASL -> active high when we are doign ASL 
+RLC                                     pin;        "input  control signal for RLC -> active high when we are doing RLC
+
+" Outputs
+Flags7..Flags0                          pin ISTYPE 'REG';         "output  8 bits of flags outputs 
+
+" Intermediate Terms
+Zero                      node;         " zero flag 
+Sign                      node;         " sign flag 
+Overflow                  node;         " overflow flag
+Carry                     node;         " carry flag
+
+" Buses
+Flags = [Flags7..Flags0];
+Data = [Data7..Data0];
+
+EQUATIONS
+
+Flags.CLK = Clock;
+Flags.CLR = !Reset;
+
+" Calculate zero adn sign flags
+Zero = !(MuxOut7 # MuxOut6 # MuxOut5 # MuxOut4 # MuxOut3 # MuxOut2 # MuxOut1 # MuxOut0); 
+Sign = MuxOut7;
+
+" If FunctionOp = 1 or were holding, we keep prev overlfow (flags2)
+Overflow = ((ASL # RLC) & (MuxOut7 $ ShiftCarry) #                              " MuxOut7 is MSB after the shift, ShiftCarry is MSB before the shift, if MSB changes -> overflow (XOR)
+           ((AdderCarry8 $ AdderCarry7) & (ControlOp & !FunctionOp)) #          
+           (Flags2 & (FunctionOp # HOLD)));                                     " LSL issue
+
+" If FunctionOp = 1, we don't modify carry and instead we load prev carry (flags3)
+" If ControlOp is 1 (meaning were adding), pass AdderCarry8
+" If ControlOp is 0 (meaning were shifting), pass ShiftCarry
+Carry = ((AdderCarry8 $ Subtract) & (ControlOp & !FunctionOp)) # (ShiftCarry & !ControlOp) # (Flags3 & FunctionOp); 
+
+" If we're not popping or holding, we update the flags, if we're popping, we load data into the flags, and if we're holding and not popping, we load the previous flags
+Flags := ([0, 0, 0, 0, Carry, Overflow, Sign, Zero] & !(POP # HOLD)) # (Data & POP) # (Flags & (!POP & HOLD));
+
+END StatusRegister
