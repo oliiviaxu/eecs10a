@@ -133,8 +133,8 @@ IO = CUnit.IO;
 " ALU Inputs
 
 " Hint: mux on the ALU source 
-ALU_SRC_DB = [1, 0];
-ALU_SRC_IR = [0, 1];
+" ALU_SRC_DB = [1, 0];
+" ALU_SRC_IR = [0, 1];
 
 ALUnit.[Data7..Data0] = (CUnit.[IR7..IR0] & CUnit.ALU_Source0) # (DataDB & CUnit.ALU_Source1);
 ALUnit.Reset = Reset;
