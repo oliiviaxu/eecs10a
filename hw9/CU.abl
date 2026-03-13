@@ -59,7 +59,7 @@ IO			                pin;	            "output  accessing memory (0) or I/O (1)
 IR  =  [IR15..IR0];                             " 16 bit instruction register
 ProgramDB = [ProgramDB15..ProgramDB0];          " 16-bit program data bus  
 ALU_CTRL = [ALU_CTRL20..ALU_CTRL0];             " ALU control signals for each instruction 
-ALU_Source = [ALU_Source1, ALU_Source0];        " TODO: ALU_Source1 is Data data bus, ALU_Source2 is instruction register
+ALU_Source = [ALU_Source1, ALU_Source0];        " TODO: ALU_Source1 is Data data bus, ALU_Source0 is instruction register
 DDB_Source = [DDB_Source3..DDB_Source0];        " TODO 
 PAU_CTRL = [PAU_CTRL4..PAU_CTRL0];              " PAU control signals
 DAU_CTRL = [DAU_CTRL7..DAU_CTRL0];              " DAU control signals 
@@ -114,16 +114,16 @@ DAU_PRE      = [1, 0, 0, 0, 0, 0, 0, 0]; " Pre (Control7)
 DAU_XOFF    = [0, 0, 0, 1, 0, 1, 0, 0]; " X Reg + Offset 
 DAU_SOFF    = [0, 0, 1, 0, 0, 1, 0, 0]; " S Reg + Offset 
 
-" ALU source: either the databus or the instruction register 
+" ALU source: either the data data bus or the instruction register 
 ALU_SRC_DB = [1, 0];
 ALU_SRC_IR = [0, 1];
 
 " Data data bus source: 
+DDB_SRC_NONE = [0, 0, 0, 0];
 DDB_SRC_ACCUM = [0, 0, 0, 1];                
 DDB_SRC_FLAGS = [0, 0, 1, 0];                
-DDB_SRC_PC    = [0, 1, 0, 0];                
-" TODO: the other branch 
-
+DDB_SRC_PC_1    = [0, 1, 0, 0];            
+DDB_SRC_PC_2 = [1, 0, 0, 0];
 
 EQUATIONS
 
@@ -137,11 +137,11 @@ IR := ProgramDB;
 WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 0]) THEN {
     ALU_CTRL = ALU_CTRL_ADC;
     PAU_CTRL = PAU_INC;
-    DAU_CTRL = DAU_SEL_OFF;
+    DAU_CTRL = DAU_SEL_OFF;                             " select m / offset
     ALU_Source = ALU_SRC_DB;
-    PAU_Offset = .X.;                   " TODO 
-    DDB_Source = DDB_SRC_ACCUM;
-    RD = 1;                             " TODO: check this 
+    PAU_Offset = .X.;                   
+    DDB_Source = DDB_SRC_NONE;                          " DDB_Source is nonzero only when we're writing
+    RD = 1;                              
     WR = 0;
     IO = 0;
 }
@@ -153,8 +153,60 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 1]) THEN {
     PAU_CTRL = PAU_INC; 
     DAU_CTRL = DAU_XOFF;
     ALU_Source = ALU_SRC_DB;
-    PAU_Offset = .X.;                  " TODO 
-    DDB_Source = DDB_SRC_ACCUM;
+    PAU_Offset = .X.;                   
+    DDB_Source = DDB_SRC_NONE;
+    RD = 1;                            
+    WR = 0;
+    IO = 0;
+}
+
+" ADCSO: Adds accumulator, carry flag, and S register and offset 
+WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_ADC;
+    PAU_CTRL = PAU_INC;
+    DAU_CTRL = DAU_SOFF; 
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = DDB_SRC_NONE;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+} 
+
+" ADCI: Adds accumulator, k (lower 8 bits of instruction), and carry flag 
+WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_ADC;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = NOP;                                     "TODO 
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = DDB_SRC_NONE;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+}
+
+" ADD: Adds accumulator and m 
+WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_ADD;
+    PAU_CTRL = PAU_INC;
+    DAU_CTRL = DAU_SEL_OFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = DDB_SRC_NONE;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+}
+
+" ADDXO - Adds accumulator, X register, and offset 
+WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 0, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_ADD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_XOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = DDB_SRC_NONE;
     RD = 1;
     WR = 0;
     IO = 0;

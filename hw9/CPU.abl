@@ -111,12 +111,10 @@ CUnit     FUNCTIONAL_BLOCK  CU;
 
 " Busses
 
-ProgramAB  =  [ProgramAB12..ProgramAB0];"13-bit Program address bus
-ProgramDB  =  [ProgramDB15..ProgramDB0];"16-bit Program data bus
-DataAB     =  [DataAB7..DataAB0];	"8-bit Data address bus
-DataDB     =  [DataDB7..DataDB0];	"8-bit Data data bus
-
-
+ProgramAB  =  [ProgramAB12..ProgramAB0];        "13-bit Program address bus (output of PAU)
+ProgramDB  =  [ProgramDB15..ProgramDB0];        "16-bit Program data bus (input to CU)
+DataAB     =  [DataAB7..DataAB0];	            "8-bit Data address bus (output of DAU)
+DataDB     =  [DataDB7..DataDB0];	            "8-bit Data data bus
 
 EQUATIONS
 
@@ -134,9 +132,9 @@ IO = CUnit.IO;
 
 " ALU Inputs
 
-ALUnit.[Data7..Data0]  =  CUnit.[IR7..IR0];         " TODO 
-ALUnit.Reset  =  Reset;
-ALUnit.Clock  =  Clock;
+ALUnit.[Data7..Data0] = CUnit.[IR7..IR0];         " TODO 
+ALUnit.Reset = Reset;
+ALUnit.Clock = Clock;
 ALUnit.ADD = CUnit.ALU_CTRL0;
 ALUnit.ADC = CUnit.ALU_CTRL1;
 ALUnit.SUB = CUnit.ALU_CTRL2;
@@ -161,8 +159,8 @@ ALUnit.POP = CUnit.ALU_CTRL20;
 
 
 " PAU Inputs 
-PAUnit.[Offset7..Offset0]   =  CUnit.[PAU_Offset7..PAU_Offset0];        " TODO 
-PAUnit.[Direct12..Direct0]  =  CUnit.[IR12..IR0];                       " TODO 
+PAUnit.[Offset7..Offset0] = CUnit.[PAU_Offset7..PAU_Offset0];        " TODO 
+PAUnit.[Direct12..Direct0] = CUnit.[IR12..IR0];                       " TODO 
 PAUnit.Increment = CUnit.PAU_CTRL0;
 PAUnit.Absolute = CUnit.PAU_CTRL1;
 PAUnit.RelativeAddressing = CUnit.PAU_CTRL2;
@@ -171,10 +169,13 @@ PAUnit.RTS2 = CUnit.PAU_CTRL4;                             "StackUpper
 PAUnit.Reset  =  Reset;
 PAUnit.Clock  =  Clock;
 
+" PAU outputs
+ProgramAB = PAUnit.[ProgAddr12..ProgAddr0];
+PC = PAUnit.[PC12..PC0];
 
 " DAU Inputs 
-DAUnit.[Accum7..Accum0]    =  ALUnit.[Accum7..Accum0];         " TODO 
-DAUnit.[Offset7..Offset0]  =  CUnit.[IR7..IR0];                " TODO 
+DAUnit.[Accum7..Accum0] = ALUnit.[Accum7..Accum0];         " TODO 
+DAUnit.[Offset7..Offset0] = CUnit.[IR7..IR0];                " TODO 
 DAUnit.Inc = CUnit.DAU_CTRL0;
 DAUnit.Dec = CUnit.DAU_CTRL1;
 DAUnit.OffsetEn = CUnit.DAU_CTRL2;      
@@ -193,7 +194,17 @@ DataAB = DAUnit.[DataAddr7..DataAddr0];
 
 " output enables
 
-DataDB = 0;
+" Mux for selecting which of the accumulator, flags, and program counter goes into the data data bus for WRITES only 
+" DDB_SRC_ACCUM = [0, 0, 0, 1];                
+" DDB_SRC_FLAGS = [0, 0, 1, 0];                
+" DDB_SRC_PC_1 = [0, 1, 0, 0]; 
+" DDB_SRC_PC_2 = [1, 0, 0, 0];   
+
+" TODO fix this 
+DataDB = ([Accum7..Accum0] & CUnit.DDB_Source0) # 
+         ([Flags7..Flags0] & CUnit.DDB_Source1) # 
+         (PC & CUnit.DDB_Source2) #                  
+         (PC & CUnit.DDB_Source3);
 
 " Data data bus is enabled when writing
 DataDB.OE  =  CUnit.WR;
