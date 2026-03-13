@@ -177,7 +177,7 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 0]) THEN {
 WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 1]) THEN {
     ALU_CTRL = ALU_CTRL_ADC;
     PAU_CTRL = PAU_INC; 
-    DAU_CTRL = NOP;                                     "TODO 
+    DAU_CTRL = 0;                                     "TODO 
     ALU_Source = ALU_SRC_IR;
     PAU_Offset = .X.;
     DDB_Source = DDB_SRC_NONE;
