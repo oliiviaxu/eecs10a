@@ -171,7 +171,6 @@ PAUnit.Clock  =  Clock;
 
 " PAU outputs
 ProgramAB = PAUnit.[ProgAddr12..ProgAddr0];
-PC = PAUnit.[PC12..PC0];
 
 " DAU Inputs 
 DAUnit.[Accum7..Accum0] = ALUnit.[Accum7..Accum0];         " TODO 
@@ -203,8 +202,8 @@ DataAB = DAUnit.[DataAddr7..DataAddr0];
 " TODO fix this 
 DataDB = ([Accum7..Accum0] & CUnit.DDB_Source0) # 
          ([Flags7..Flags0] & CUnit.DDB_Source1) # 
-         (PC & CUnit.DDB_Source2) #                  
-         (PC & CUnit.DDB_Source3);
+         (PAUnit.[PC12..PC0] & CUnit.DDB_Source2) #                  
+         (PAUnit.[PC12..PC0] & CUnit.DDB_Source3);
 
 " Data data bus is enabled when writing
 DataDB.OE  =  CUnit.WR;
