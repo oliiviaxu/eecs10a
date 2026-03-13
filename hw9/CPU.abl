@@ -186,6 +186,10 @@ DAUnit.Pre = CUnit.DAU_CTRL7;
 DAUnit.Reset  =  Reset;
 DAUnit.Clock  =  Clock;
 
+" Get output of DAU 
+DataAB = DAUnit.[DataAddr7..DataAddr0];
+[XReg7..XReg0] = DAUnit.[XReg7..XReg0];
+[SReg7..SReg0] = DAUnit.[SReg7..SReg0];
 
 " output enables
 
