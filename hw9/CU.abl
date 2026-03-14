@@ -301,7 +301,7 @@ WHEN (IR[15..0] == [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]) THEN {
     PAU_Offset = .X.;
     DDB_Source = DDB_SRC_FLAGS;
     RD = 0;                             
-    WR = 1;                                     " TODO: check this
+    WR = 1;                                     
     IO = 0;
 }
 
@@ -317,6 +317,21 @@ WHEN (IR[15..0] == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) THEN {
     WR = 0;                                     " TODO: check this
     IO = 0;
 }
+
+" POPF: pop flag register off of the stack 
+" increment S 
+WHEN (IR[15..0] == [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_POP;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [0, 0, 1, 0, 0, 0, 0, 1];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
 
 
 END CU
