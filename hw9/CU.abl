@@ -259,7 +259,7 @@ WHEN (IR[15..8] == [1, 0, 0, 0, 0, 0, 0, 0]) THEN {
     ALU_CTRL = ALU_CTRL_LOAD;
     PAU_CTRL = PAU_INC; 
     DAU_CTRL = DAU_SEL_OFF;
-    ALU_Source = ALU_SRC_DDB;
+    ALU_Source = ALU_SRC_DB;
     PAU_Offset = .X.;
     DDB_Source = 0;
     RD = 1;
