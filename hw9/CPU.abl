@@ -163,7 +163,7 @@ ALUnit.POP = CUnit.ALU_CTRL20;
 
 " ALU outputs
 [Accum7..Accum0] = ALUnit.[Accum7..Accum0];
-[Flags7..Flags0] = ALUnit.[Flags7..Flags0];
+[Flags7..Flags0] = !ALUnit.[Flags7..Flags0];
 
 " PAU Inputs 
 PAUnit.[Offset7..Offset0] = CUnit.[PAU_Offset7..PAU_Offset0];        " TODO 
