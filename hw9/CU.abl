@@ -1099,4 +1099,135 @@ WHEN (IR[15..8] == [1, 0, 0, 1, 1, 0, 0, 0]) THEN {
     IO = 0;
 }
 
+" JL: if S noteq V then PC + r + 1
+" if S noteq V means Flags1 XOR Flags2 
+WHEN (IR[15..8] == [1, 0, 1, 1, 1, 0, 0, 0]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, (Flags1 $ Flags2), 0, !(Flags1 $ Flags2)]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JLE: if (S noteq V) OR (Z = 1) then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 1, 0, 1, 1, 0, 0]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, (Flags1 $ Flags2) # (Flags0), 0, !((Flags1 $ Flags2) # (Flags0))]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JG: if (S = V) AND (Z = 0) then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 1, 0, 1, 1, 0, 0]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, !(Flags1 $ Flags2) & !Flags0, 0, !(!(Flags1 $ Flags2) & !Flags0)]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JGE: if S = V then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 1, 1, 1, 0, 1, 1]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, !(Flags1 $ Flags2), 0, Flags1 $ Flags2]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JA: if (C = 0) AND (Z = 0) then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 0, 0, 1, 0, 0, 0]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, !Flags3 & !Flags0, 0, !(!Flags3 & !Flags0)]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JAE/JNC: if C = 0 then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 0, 0, 1, 1, 0, 0]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, !Flags3, 0, Flags3]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JB: if C = 1 then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 0, 0, 1, 1, 1, 1]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, Flags3, 0, !Flags3]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JBE: if (C = 1) OR (Z = 1) then PC ¬ PC + r + 1
+WHEN (IR[15..8] == [1, 0, 0, 0, 1, 0, 1, 1]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, Flags3 # Flags0, 0, !(Flags3 # Flags0)]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JNV: if V = 0 then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 1, 0, 1, 0, 0, 0]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, !Flags2, 0, Flags2]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" JV: if V = 1 then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 1, 0, 1, 0, 1, 1]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, Flags2, 0, !Flags2]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
 END CU
