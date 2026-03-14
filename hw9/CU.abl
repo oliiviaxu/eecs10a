@@ -119,10 +119,9 @@ ALU_SRC_DB = [1, 0];
 ALU_SRC_IR = [0, 1];
 
 " Data data bus source: 
-DDB_SRC_NONE = [0, 0, 0, 0];
 DDB_SRC_ACCUM = [0, 0, 0, 1];                
 DDB_SRC_FLAGS = [0, 0, 1, 0];                
-DDB_SRC_PC_1    = [0, 1, 0, 0];            
+DDB_SRC_PC_1 = [0, 1, 0, 0];            
 DDB_SRC_PC_2 = [1, 0, 0, 0];
 
 EQUATIONS
@@ -140,7 +139,7 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 0]) THEN {
     DAU_CTRL = DAU_SEL_OFF;                             " select m / offset
     ALU_Source = ALU_SRC_DB;
     PAU_Offset = .X.;                   
-    DDB_Source = DDB_SRC_NONE;                          " DDB_Source is nonzero only when we're writing
+    DDB_Source = 0;                          " DDB_Source is nonzero only when we're writing
     RD = 1;                              
     WR = 0;
     IO = 0;
@@ -154,7 +153,7 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 1]) THEN {
     DAU_CTRL = DAU_XOFF;
     ALU_Source = ALU_SRC_DB;
     PAU_Offset = .X.;                   
-    DDB_Source = DDB_SRC_NONE;
+    DDB_Source = 0;
     RD = 1;                            
     WR = 0;
     IO = 0;
@@ -167,7 +166,7 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 0]) THEN {
     DAU_CTRL = DAU_SOFF; 
     ALU_Source = ALU_SRC_DB;
     PAU_Offset = .X.;
-    DDB_Source = DDB_SRC_NONE;
+    DDB_Source = 0;
     RD = 1;
     WR = 0;
     IO = 0;
@@ -180,7 +179,7 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 1]) THEN {
     DAU_CTRL = 0;                                     "TODO 
     ALU_Source = ALU_SRC_IR;
     PAU_Offset = .X.;
-    DDB_Source = DDB_SRC_NONE;
+    DDB_Source = 0;
     RD = 1;
     WR = 0;
     IO = 0;
@@ -193,7 +192,7 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 0, 0]) THEN {
     DAU_CTRL = DAU_SEL_OFF;
     ALU_Source = ALU_SRC_DB;
     PAU_Offset = .X.;
-    DDB_Source = DDB_SRC_NONE;
+    DDB_Source = 0;
     RD = 1;
     WR = 0;
     IO = 0;
@@ -206,7 +205,7 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 0, 1]) THEN {
     DAU_CTRL = DAU_XOFF;
     ALU_Source = ALU_SRC_DB;
     PAU_Offset = .X.;
-    DDB_Source = DDB_SRC_NONE;
+    DDB_Source = 0;
     RD = 1;
     WR = 0;
     IO = 0;

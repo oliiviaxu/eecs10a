@@ -161,6 +161,9 @@ ALUnit.ASL = CUnit.ALU_CTRL18;
 ALUnit.LOAD = CUnit.ALU_CTRL19;
 ALUnit.POP = CUnit.ALU_CTRL20;
 
+" ALU outputs
+[Accum7..Accum0] = ALUnit.[Accum7..Accum0];
+[Flags7..Flags0] = ALUnit.[Flags7..Flags0];
 
 " PAU Inputs 
 PAUnit.[Offset7..Offset0] = CUnit.[PAU_Offset7..PAU_Offset0];        " TODO 
@@ -206,6 +209,7 @@ DataAB = DAUnit.[DataAddr7..DataAddr0];
 " TODO fix this
 " CALL one of them will be low 8 bits of PC 
 " the other is high 5
+" 
 DataDB = ([Accum7..Accum0] & CUnit.DDB_Source0) # 
          ([Flags7..Flags0] & CUnit.DDB_Source1);
 
