@@ -552,4 +552,109 @@ WHEN (IR[15..8] == [1, 0, 1, 0, 1, 0, 1, 0]) THEN {
     WR = 1;                                     
     IO = 0;
 }
+
+" SBB: Acc = Acc – (m) – C
+WHEN (IR[15..8] == [0, 0, 0, 1, 1, 0, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_SBB;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SEL_OFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" SBB: Acc – (X + o) – C
+WHEN (IR[15..8] == [0, 0, 0, 1, 1, 0, 0, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_SBB;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_XOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" SBB: Acc – (S + o) – C
+WHEN (IR[15..8] == [0, 0, 0, 1, 1, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_SBB;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" SBBI: Acc – k – C
+WHEN (IR[15..8] == [0, 0, 0, 1, 1, 0, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_SBB;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" SUB: Acc – (m)
+WHEN (IR[15..8] == [0, 0, 0, 1, 0, 0, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_SUB;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SEL_OFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" SUB: Acc – (X + o) 
+WHEN (IR[15..8] == [0, 0, 0, 1, 0, 0, 0, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_SUB;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_XOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" SUB: Acc – (S + o)
+WHEN (IR[15..8] == [0, 0, 0, 1, 0, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_SUB;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" SUBI: Acc – k
+WHEN (IR[15..8] == [0, 0, 0, 1, 0, 0, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_SUB;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
 END CU
