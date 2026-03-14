@@ -1047,4 +1047,17 @@ WHEN (IR[15..8] == [0, 0, 1, 1, 0, 1, 1, 1]) THEN {
     IO = 0;
 }
 
+" JE/JZ: branch if zero bit set (equal) if Z = 1 then PC + r + 1
+WHEN (IR[15..8] == [1, 0, 0, 1, 1, 1, 1, 1]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = [0, 0, Flags0, 0, !Flags0]; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = [IR7..IR0];
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
 END CU
