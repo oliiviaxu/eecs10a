@@ -345,4 +345,17 @@ WHEN (IR[15..0] == [0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]) THEN {
     IO = 0;
 }
 
+" ORI: Acc OR k
+WHEN (IR[15..8] == [0, 1, 1, 1, 0, 1, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_OR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
 END CU
