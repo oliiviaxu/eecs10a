@@ -1127,7 +1127,7 @@ WHEN (IR[15..8] == [1, 0, 1, 0, 1, 1, 0, 0]) THEN {
 }
 
 " JG: if (S = V) AND (Z = 0) then PC + r + 1
-WHEN (IR[15..8] == [1, 0, 1, 0, 1, 1, 0, 0]) THEN {
+WHEN (IR[15..8] == [1, 0, 1, 0, 1, 1, 1, 1]) THEN {
     ALU_CTRL = 0;
     PAU_CTRL = [0, 0, !(Flags1 $ Flags2) & !Flags0, 0, !(!(Flags1 $ Flags2) & !Flags0)]; 
     DAU_CTRL = 0;
