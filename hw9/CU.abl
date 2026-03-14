@@ -110,7 +110,6 @@ DAU_SEL_S    = [0, 0, 1, 0, 0, 0, 0, 0]; " S Reg (Control5)
 DAU_SEL_ACC  = [0, 1, 0, 0, 0, 0, 0, 0]; " Accumulator (Control6)
 DAU_PRE      = [1, 0, 0, 0, 0, 0, 0, 0]; " Pre (Control7)
 
-"TODO: check this
 DAU_XOFF    = [0, 0, 0, 1, 0, 1, 0, 0]; " X Reg + Offset 
 DAU_SOFF    = [0, 0, 1, 0, 0, 1, 0, 0]; " S Reg + Offset 
 
@@ -942,4 +941,110 @@ WHEN (IR[15..8] == [0, 1, 0, 0, 1, 1, 1, 1]) THEN {
     WR = 0;                                     
     IO = 0;
 } 
+
+" TODO: check this
+" OR: Acc OR m 
+WHEN (IR[15..8] == [0, 1, 1, 1, 0, 1, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_OR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SEL_OFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" OR: Acc OR (X + o)
+WHEN (IR[15..8] == [0, 1, 1, 1, 0, 1, 0, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_OR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_XOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" OR: Acc OR (S + o)
+WHEN (IR[15..8] == [0, 1, 1, 1, 0, 1, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_OR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" OR: Acc OR k 
+WHEN (IR[15..8] == [0, 1, 1, 1, 0, 1, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_OR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" XOR: Acc XOR m 
+WHEN (IR[15..8] == [0, 0, 1, 1, 0, 1, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_XOR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SEL_OFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" XOR: Acc XOR (X + o)
+WHEN (IR[15..8] == [0, 0, 1, 1, 0, 1, 0, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_XOR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_XOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" XOR: Acc XOR (S + o)
+WHEN (IR[15..8] == [0, 0, 1, 1, 0, 1, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_XOR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" XOR: Acc XOR k
+WHEN (IR[15..8] == [0, 0, 1, 1, 0, 1, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_XOR;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
 END CU
