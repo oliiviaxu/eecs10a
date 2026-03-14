@@ -198,6 +198,19 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 0, 0]) THEN {
     IO = 0;
 }
 
+" ADDSO - Adds accumulator, S register, and offset
+WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_ADD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+}
+
 " ADDXO - Adds accumulator, X register, and offset 
 WHEN (IR[15..8] == [0, 1, 1, 0, 1, 0, 0, 1]) THEN {
     ALU_CTRL = ALU_CTRL_ADD;
