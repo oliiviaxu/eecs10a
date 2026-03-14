@@ -165,7 +165,7 @@ AdderCarry7 = Accumulator.AdderCarry7;
 
 " Outputs of the accuulator -> input into the status register 
 StatusReg.[MuxOut7..MuxOut0] = [MuxOut7..MuxOut0];
-StatusReg.[Data7..Data0] = [Data7..Data0];
+StatusReg.[Data7..Data0] = [Data7, 0, Data5, 0, Data3..Data0];    " issue with flags 4 and 6
 StatusReg.AdderCarry8 = AdderCarry8;
 StatusReg.AdderCarry7 = AdderCarry7;
 StatusReg.ShiftCarry = ShiftCarry;
