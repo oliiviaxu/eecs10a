@@ -1,0 +1,102 @@
+MODULE          ProgramAccess
+INTERFACE       (Offset7..Offset0, Direct12..Direct0,
+                          RelativeAddressing, Increment, Absolute, RTS1, RTS2,
+                          Reset, Clock
+                          -> ProgAddr12..ProgAddr0, PC12..PC0);
+
+TITLE           'Program Memory Unit'
+
+" Description:  This module implements the program counter and program memory
+"               access unit. It generates the next program address based on
+"               the selected addressing mode: increment (step), relative
+"               (offset), absolute (direct), or RTS (return to subroutine).  
+"
+" Inputs:       Offset[7..0]            - 8 bits of offset or data input (8 bit data bus)
+"               Direct[12..0]           - 13 bits of address input
+"               RelativeAddressing      - control input for relative addresssing
+"               Increment               - control input for step
+"               Absolute                - control input for absolute addressing
+"               RTS1                    - control input for updating lower 8 bits of
+"                                         the PC 
+"               RTS2                    - control input for updating upper 5 bits of
+"                                         the PC
+"               Reset                   - system reset
+"               Clock                   - system clock
+"
+" Outputs:      ProgAddr[12..0]         - 13 bits of program address bus
+"               PC[12..0]               - 13 bits of program counter
+
+" Revision History:
+" 02/23/26   Olivia Xu  Initial Revision
+" 02/23/26   Olivia Xu  Fixed some typos
+" 02/23/26   Olivia Xu  Bug fix related to RelativeAddressing confusion
+
+" Pin/Signal Declarations
+
+" Inputs 
+
+Offset7..Offset0            pin;    "input  8 bits of offset or data    
+Direct12..Direct0           pin;    "input  13 bits of address or data      
+RelativeAddressing          pin;    "input  control signal for relative addressing    
+Increment                   pin;    "input  control signal for incrementing (step)       
+Absolute                    pin;    "input  control signal for direct / absolute address        
+RTS1                        pin;    "input  control signal for updating lower 8 bits of PC
+RTS2                        pin;    "input  control signal for updating upper 5 bits of PC
+Reset			            pin;	"input  system reset
+Clock           	        pin;	"input  system clock
+
+" Outputs
+
+ProgAddr12..ProgAddr0       pin;                            "output  13 bits of program address bus
+PC12..PC0                   pin ISTYPE 'REG, KEEP';         "output  13 bits of program counter
+
+" Constants
+
+ONE   =  [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ];    " 13-bit value of 1
+
+" Intermediate Terms
+
+Relative                   node;  "Relative signal into the and gate    
+SOffset12..SOffset0        node;  "Sign-extended 13-bit version of 8-bit offset
+MuxOut12..MuxOut0          node;  "13 bits of mux output
+Carry13..Carry0            node;  "14 bits of carry for adding PC and MuxOut
+Hold                       node;  
+
+" Buses
+Offset = [Offset7..Offset0];            
+SOffset = [SOffset12..SOffset0];        
+Direct = [Direct12..Direct0];
+ProgAddr = [ProgAddr12..ProgAddr0];
+MuxOut = [MuxOut12..MuxOut0];
+Carry = [Carry13..Carry0];              
+PC = [PC12..PC0];                   
+
+EQUATIONS
+
+" clocks 
+
+PC.CLK = Clock;
+PC.CLR = Reset;
+
+Hold = !(Increment # RelativeAddressing # Absolute # RTS1 # RTS2);
+
+Relative = Increment # RelativeAddressing # Hold;
+
+SOffset = [Offset7, Offset7, Offset7, Offset7, Offset7, Offset7..Offset0];
+
+MuxOut  =  (Increment & ONE) #          
+            (RelativeAddressing & SOffset) #          
+            (Absolute & Direct) #          
+            (RTS1 & [PC12..PC8, Offset7..Offset0]) # 
+            (RTS2 & [Offset4..Offset0, PC7..PC0]) # 
+            (Hold & 0);
+
+" We are trying to do PC := (Relative & PC) + MuxOut (from the lecture slides);
+
+Carry0 = 0;
+[Carry13..Carry1] = ((PC & Relative) & MuxOut) # ([Carry12..Carry0] & ((PC & Relative) $ MuxOut)); " PC & Relative are A0, MuxOut is B0 (from HW4)
+PC := (PC & Relative) $ MuxOut $ [Carry12..Carry0];
+
+ProgAddr = PC;
+
+END ProgramAccess

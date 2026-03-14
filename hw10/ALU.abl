@@ -1,0 +1,187 @@
+MODULE      ALU 
+INTERFACE  (Data7..Data0,
+            LSR, ASR, ROR, RRC, ROL, RLC, ASL,                            
+            ADD, ADC, SBB, SUB, CMP, INC, DEC,                              
+            AND, OR, XOR, NOT, TST,                                  
+            LOAD, POP, 
+            Reset, Clock
+            -> Accum7..Accum0, Flags7..Flags0);              
+
+TITLE           'Combining the FBlock, Adder, and Shift Block Implementation as well as the status register to form the ALU'
+
+" Description:   Wrapper module for the ALU. 
+"                This module connects ALUBlocks with the 
+"                Status Register.
+"
+" Inputs:       
+"               Data7..Data0                                   - 8 bits of Operand B
+"               LSR, ASR, ROR, RRC, ROL, RLC, ASL              - Control signals for shifts 
+"               ADD, ADC, SBB, SUB, CMP, INC, DEC              - Adder Control Signals
+"               AND, OR, XOR, NOT, TST                         - FBlock Control Signals                                        
+"               Reset, Clock                                
+"
+" Outputs:      Accum[7..0]                                    - 8 bits of accumulator
+"               Flags[7..0]                                    - 8 bits of ALU status flags                             
+"
+" Revision History:
+" 02/26/26   Olivia Xu  Initial Revision
+" 02/27/26   Olivia Xu  Bug / syntax fixes
+" 02/27/26   Olivia Xu  Overflow flag error not showing up fix for LSL test case
+" 02/28/26   Olivia Xu  Added more comments
+
+" Pin/Signal Declarations
+
+" Inputs 
+Data7..Data0                                pin;        "input  8 bits of operand B (from the video diagram)
+RRC, ROL, RLC, ASL, LSR, ASR, ROR           pin;        "input  Rotate / shift operation control signals
+ADD, ADC, SBB, SUB, CMP, INC, DEC           pin;        "input  Adder block control signals
+AND, OR, XOR, NOT, TST                      pin;        "input  functional / logical control signals
+LOAD, POP                                   pin;        "input  load and popping control signals 
+Reset, Clock                                pin;        "input  system clock and reset
+
+" Outputs
+Accum7..Accum0                              pin;        "output  8 bits of accumulator
+Flags7..Flags0                              pin;        "output  8 bits of flags
+
+" Intermediate Terms
+
+MuxOut7..MuxOut0                            node;       " output of the 2:1 mux of the ALU
+AdderCarry8                                 node;       " Carryout from the Adder
+AdderCarry7                                 node;       " Carryin from the Adder
+ShiftCarry                                  node;       " The bit shifted out during shift/rotate ops
+ControlOp                                   node;       " 1 for adder ops, 0 for shift
+FunctionOp                                  node;       " 1 for logic ops (AND/OR/XOR/NOT/TST)
+Hold                                        node;       " HOLD control signal passed into ALUBlocks
+Subtract                                    node;       " Subtraction operation (SUB/SBB/CMP)
+
+" Buses
+Data = [Data7..Data0];                                  " 8-bit bus for Operand B input
+MuxOut = [MuxOut7..MuxOut0];                            " 8-bit bus holding the final ALU result
+
+" Constants 
+
+" Derived the following from the truth table from the video 
+" We only care about AND, NOT, OR, XOR (from the slides)
+" Used to define FOp3..FOp0 control signals of the FBlok 
+
+AandB = [1, 0, 0, 0];                                   
+AorB = [1, 1, 1, 0];                                    
+AxorB = [0, 1, 1, 0];
+notA = [0, 0, 1, 1];
+notB = [0, 1, 0, 1];
+opB = [1, 0, 1, 0];
+
+" StatusRegister and ALUBlocks modules
+ALUBlocks INTERFACE (Data7..Data0,                                           
+                LSR, ASR, ROR, RRC, ROL, RLC, ASL,                                 
+                FOp3..FOp0,                                                        
+                ADD, ADC, SBB, SUB,                                                 
+                CMP,                                                              
+                INC, DEC,                                                           
+                TST,
+                HOLD,
+                ControlOp,                                                          
+                CarryFlag,
+                LOAD,                                
+                Clock, Reset                                                            
+                -> Accum7..Accum0,                                                  
+                   MuxOut7..MuxOut0,                                                
+                   AdderCarry8, AdderCarry7,                                                  
+                   ShiftCarry);                                                     
+
+StatusRegister INTERFACE       (MuxOut7..MuxOut0, 
+                                Data7..Data0,
+                                AdderCarry8, 
+                                AdderCarry7,
+                                ShiftCarry,
+                                POP,
+                                HOLD,
+                                ControlOp,                     
+                                FunctionOp,
+                                Subtract,
+                                ASL, RLC,
+                                Clock, Reset                     
+                                -> Flags7..Flags0);
+
+" create instances of the above modules
+Accumulator     FUNCTIONAL_BLOCK    ALUBlocks;
+StatusReg  FUNCTIONAL_BLOCK    StatusRegister;
+
+EQUATIONS
+
+" FBlock Control Signal Generation
+
+Accumulator.[FOp3..FOp0] = (AorB & OR) #                            
+                           (notA & NOT) #
+                           (AandB & (AND # TST)) #                          
+                           (AxorB & XOR) #
+                           (opB & (ADD # ADC)) #                        " we want the F = B (output) (pass B straight through to the adder)
+                           (notB & (SUB # SBB # CMP)) #                 " we want F = notB if we are SUB, SBB, CMP (invert B for 2s complement)
+                           (0 & INC) #                                  " If INC, want B to be 0
+                           (1 & DEC);                                   " If DEC, want B to be all 1s
+
+" Hold if all the other operations are not true
+Hold = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL # ADD # ADC # SBB # SUB # CMP # INC # DEC # AND # OR # XOR # NOT # TST);
+
+" Generate ControlOp (1 for Adder, 0 for Shift operations)
+ControlOp = !(LSR # ASR # ROR # RRC # ROL # RLC # ASL);
+
+" Generate FunctionOp (1 for function / logic operations, 0 otherwise)
+FunctionOp = (AND # OR # XOR # NOT # TST);
+
+" Generate Subtract control signal 
+Subtract = (SUB # SBB # DEC # CMP);
+
+" Inputs into the Accumulator
+Accumulator.[Data7..Data0] = [Data7..Data0];
+Accumulator.CarryFlag = Flags3;
+Accumulator.LSR = LSR;                          
+Accumulator.ASR = ASR;
+Accumulator.ROR = ROR;
+Accumulator.RRC = RRC;
+Accumulator.ROL = ROL;
+Accumulator.RLC = RLC;
+Accumulator.ASL = ASL;
+Accumulator.ADD = ADD;
+Accumulator.ADC = ADC;
+Accumulator.SUB = SUB;
+Accumulator.SBB = SBB;
+Accumulator.CMP = CMP;
+Accumulator.INC = INC;
+Accumulator.DEC = DEC;
+Accumulator.TST = TST;
+Accumulator.HOLD = Hold;
+Accumulator.Reset = Reset;              
+Accumulator.Clock = Clock;
+Accumulator.ControlOp = ControlOp;
+Accumulator.LOAD = LOAD;
+
+" Extract outputs of the accumulator
+[Accum7..Accum0] = Accumulator.[Accum7..Accum0];
+[MuxOut7..MuxOut0] = Accumulator.[MuxOut7..MuxOut0];
+ShiftCarry = Accumulator.ShiftCarry;
+AdderCarry8 = Accumulator.AdderCarry8;
+AdderCarry7 = Accumulator.AdderCarry7;
+
+" Outputs of the accuulator -> input into the status register 
+StatusReg.[MuxOut7..MuxOut0] = [MuxOut7..MuxOut0];
+StatusReg.[Data7..Data0] = [Data7, 0, Data5, 0, Data3..Data0];    " issue with flags 4 and 6
+StatusReg.AdderCarry8 = AdderCarry8;
+StatusReg.AdderCarry7 = AdderCarry7;
+StatusReg.ShiftCarry = ShiftCarry;
+StatusReg.POP = POP;
+StatusReg.ControlOp = ControlOp;
+StatusReg.FunctionOp = FunctionOp;
+StatusReg.Clock = Clock;
+StatusReg.Reset = Reset;
+StatusReg.HOLD = LOAD # Hold;
+StatusReg.Subtract = Subtract;
+StatusReg.ASL = ASL;
+StatusReg.RLC = RLC;
+
+" Extract the flags from the status register
+" The carry flags are active low, so we !StatusReg
+
+[Flags7..Flags0] = !StatusReg.[Flags7..Flags0];
+
+END ALU
