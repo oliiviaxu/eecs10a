@@ -267,4 +267,31 @@ WHEN (IR[15..8] == [1, 0, 0, 0, 0, 0, 0, 0]) THEN {
     IO = 0;
 }
 
+" JMP: PC jumps to a
+WHEN (IR[15..13] == [1, 1, 0]) THEN {
+    ALU_CTRL = 0;
+    PAU_CTRL = PAU_ABSOLUTE; 
+    DAU_CTRL = 0;
+    ALU_Source = 0;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 0;
+    WR = 0;
+    IO = 0;
+}
+
+" ANDI: Acc is Acc AND k
+WHEN (IR[15..8] == [0, 1, 0, 0, 0, 1, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_AND;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 0;                             " TODO: check this
+    WR = 0;
+    IO = 0;
+}
+
+
 END CU
