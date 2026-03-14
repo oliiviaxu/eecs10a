@@ -709,4 +709,134 @@ WHEN (IR[15..8] == [0, 0, 1, 1, 0, 0, 1, 0]) THEN {
     IO = 0;
 }
 
+" LD: load Accumulator indirect from (X + o)
+WHEN (IR[15..8] == [1, 0, 0, 1, 0, 1, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_XOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (X + o) then post-increment X
+WHEN (IR[15..8] == [1, 0, 0, 1, 0, 1, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [0, 0, 0, 1, 0, 1, 0, 1];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (X + o) then post-decrement X
+WHEN (IR[15..8] == [1, 0, 0, 1, 1, 1, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [0, 0, 0, 1, 0, 1, 1, 0];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (X + o) after pre-incrementing X
+WHEN (IR[15..8] == [1, 0, 0, 0, 0, 1, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [1, 0, 0, 1, 0, 1, 0, 1];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (X + o) after pre-decrementing X
+WHEN (IR[15..8] == [1, 0, 0, 0, 1, 1, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [1, 0, 0, 1, 0, 1, 1, 0];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (S + o) 
+WHEN (IR[15..8] == [1, 0, 0, 1, 0, 0, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (S + o) then post-increment S
+WHEN (IR[15..8] == [1, 0, 0, 1, 0, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [0, 0, 1, 0, 0, 1, 0, 1];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (S + o) then post-decrement S
+WHEN (IR[15..8] == [1, 0, 0, 1, 1, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [0, 0, 1, 0, 0, 1, 1, 0];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (S + o) after pre-incrementing S
+WHEN (IR[15..8] == [1, 0, 0, 0, 0, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [1, 0, 1, 0, 0, 1, 0, 1];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" LD: load Accumulator indirect from (S + o) after pre-decrementing S
+WHEN (IR[15..8] == [1, 0, 0, 0, 1, 0, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_LOAD;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = [1, 0, 1, 0, 0, 1, 1, 0];
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
 END CU
