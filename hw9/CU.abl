@@ -891,4 +891,55 @@ WHEN (IR[15..8] == [0, 1, 0, 0, 0, 1, 1, 1]) THEN {
     IO = 0;
 }
 
+" TST: Acc AND m, but not changing acc 
+WHEN (IR[15..8] == [0, 1, 0, 0, 1, 1, 0, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_TST;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SEL_OFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" TST: Acc AND (X + o), but not changing acc 
+WHEN (IR[15..8] == [0, 1, 0, 0, 1, 1, 0, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_TST;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_XOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" TST: Acc AND (S + o), but not changing acc
+WHEN (IR[15..8] == [0, 1, 0, 0, 1, 1, 1, 0]) THEN {
+    ALU_CTRL = ALU_CTRL_TST;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = DAU_SOFF;
+    ALU_Source = ALU_SRC_DB;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 1;                             
+    WR = 0;                                     
+    IO = 0;
+}
+
+" TST: Acc AND k, not changing acc
+WHEN (IR[15..8] == [0, 1, 0, 0, 1, 1, 1, 1]) THEN {
+    ALU_CTRL = ALU_CTRL_TST;
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;
+    ALU_Source = ALU_SRC_IR;
+    PAU_Offset = .X.;
+    DDB_Source = 0;
+    RD = 0;                             
+    WR = 0;                                     
+    IO = 0;
+} 
 END CU
