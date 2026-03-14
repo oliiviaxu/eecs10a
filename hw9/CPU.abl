@@ -124,8 +124,7 @@ CUnit.[Flags7..Flags0] = [Flags7..Flags0];
 CUnit.Clock = Clock;
 CUnit.Reset = Reset;
 
-" outputs of CUnit 
-" TODO
+" RD, WR, IO outputs of CUnit 
 RD = CUnit.RD;
 WR = CUnit.WR;
 IO = CUnit.IO;
@@ -166,8 +165,8 @@ ALUnit.POP = CUnit.ALU_CTRL20;
 [Flags7..Flags0] = !ALUnit.[Flags7..Flags0];
 
 " PAU Inputs 
-PAUnit.[Offset7..Offset0] = CUnit.[PAU_Offset7..PAU_Offset0];        " TODO 
-PAUnit.[Direct12..Direct0] = CUnit.[IR12..IR0];                       " TODO 
+PAUnit.[Offset7..Offset0] = CUnit.[PAU_Offset7..PAU_Offset0];         
+PAUnit.[Direct12..Direct0] = CUnit.[IR12..IR0];                        
 PAUnit.Increment = CUnit.PAU_CTRL0;
 PAUnit.Absolute = CUnit.PAU_CTRL1;
 PAUnit.RelativeAddressing = CUnit.PAU_CTRL2;
@@ -180,8 +179,8 @@ PAUnit.Clock  =  Clock;
 [ProgramAB12..ProgramAB0] = PAUnit.[ProgAddr12..ProgAddr0];
 
 " DAU Inputs 
-DAUnit.[Accum7..Accum0] = ALUnit.[Accum7..Accum0];         " TODO 
-DAUnit.[Offset7..Offset0] = CUnit.[IR7..IR0];                " TODO 
+DAUnit.[Accum7..Accum0] = ALUnit.[Accum7..Accum0];          
+DAUnit.[Offset7..Offset0] = CUnit.[IR7..IR0];                 
 DAUnit.Inc = CUnit.DAU_CTRL0;
 DAUnit.Dec = CUnit.DAU_CTRL1;
 DAUnit.OffsetEn = CUnit.DAU_CTRL2;      
@@ -201,15 +200,15 @@ DataAB = DAUnit.[DataAddr7..DataAddr0];
 " output enables
 
 " Mux for selecting which of the accumulator, flags, and program counter goes into the data data bus for WRITES only 
+" Notes for HW10: 
+" CALL: one of them will be low 8 bits of PC 
+" the other is high 5 
+" TODO: add two more mux inputs for hw10 
 " DDB_SRC_ACCUM = [0, 0, 0, 1];                
 " DDB_SRC_FLAGS = [0, 0, 1, 0];                
 " DDB_SRC_PC_1 = [0, 1, 0, 0]; 
-" DDB_SRC_PC_2 = [1, 0, 0, 0];   
+" DDB_SRC_PC_2 = [1, 0, 0, 0];  
 
-" TODO fix this
-" CALL one of them will be low 8 bits of PC 
-" the other is high 5
-" 
 DataDB = ([Accum7..Accum0] & CUnit.DDB_Source0) # 
          ([Flags7..Flags0] & CUnit.DDB_Source1);
 

@@ -20,15 +20,21 @@ TITLE      'Control Unit'
 "                 Reset             - system reset signal
 "                 Clock             - system clock
 " 
-" Outputs:        
-"                 TODO
+" Outputs:        IR[15..0]         - Instruction register output                  
 "                 RD                - read signal for the data data bus
 "                 WR                - write signal for the data data bus
 "                 IO                - memory (0) or I/O (1) is being accessed
-"
+"                 ALU_CTRL[20..0]   - ALU control signals 
+"                 PAU_CTRL[4..0]    - PAU control signals 
+"                 DAU_CTRL[7..0]    - DAU control signals 
+"                 ALU_Source[1..0]   - ALU source: either the Data data bus (ALU_Source1) or the IR (ALU_Source0)
+"                 DDB_Source[3..0]   - Data data bus source: either the accum (DDB_Source0), flags (DDB_Source1), program counter 1 (DDB_Source2), or program counter 2 (DDB_Source3) 
+"                 PAU_Offset[7..0]   - 8 bits of data passed to PAU
+
 " Revision History:
 " 03/11/26   Olivia Xu  Initial Revision
-" TODO 
+" 03/13/26   Olivia Xu  Added majority of the when statements
+" 03/14/26   Olivia Xu  Added comments 
 
 
 " Pin/Signal Declarations
@@ -46,10 +52,10 @@ IR15..IR0                   pin ISTYPE 'REG';	"output  the 16-bit instruction re
 ALU_CTRL20..ALU_CTRL0       pin;                "output  21 control signals into the ALU 
 PAU_CTRL4..PAU_CTRL0        pin;                "output  5 control signals into PAU
 DAU_CTRL7..DAU_CTRL0        pin;                "output  8 control signals into DAU
-ALU_Source1                 pin;                "output  TODO
-ALU_Source0                 pin;                "output  TODO
+ALU_Source1                 pin;                "output  Data data bus sourced into ALU
+ALU_Source0                 pin;                "output  IR as source into ALU
 PAU_Offset7..PAU_Offset0    pin;                "output  8 bits of offset into PAU
-DDB_Source3..DDB_Source0    pin;                "output  TODO
+DDB_Source3..DDB_Source0    pin;                "output  the source into the data data bus is (following the diagram): accumulator (DDB_Source0), flags (DDB_Source1), program counter 1 (DDB_Source2), or program counter 2 (DDB_Source3) 
 RD			                pin;	            "output  read signal for the Data data bus
 WR			                pin;	            "output  write signal for the Data data bus
 IO			                pin;	            "output  accessing memory (0) or I/O (1)
@@ -59,8 +65,8 @@ IO			                pin;	            "output  accessing memory (0) or I/O (1)
 IR  =  [IR15..IR0];                             " 16 bit instruction register
 ProgramDB = [ProgramDB15..ProgramDB0];          " 16-bit program data bus  
 ALU_CTRL = [ALU_CTRL20..ALU_CTRL0];             " ALU control signals for each instruction 
-ALU_Source = [ALU_Source1, ALU_Source0];        " TODO: ALU_Source1 is Data data bus, ALU_Source0 is instruction register
-DDB_Source = [DDB_Source3..DDB_Source0];        " TODO 
+ALU_Source = [ALU_Source1, ALU_Source0];        " ALU_Source1 is Data data bus, ALU_Source0 is IR
+DDB_Source = [DDB_Source3..DDB_Source0];        " the source into the data data bus is (following the diagram): accum (DDB_Source0), flags (DDB_Source1), program counter 1 (DDB_Source2), or program counter 2 (DDB_Source3) 
 PAU_CTRL = [PAU_CTRL4..PAU_CTRL0];              " PAU control signals
 DAU_CTRL = [DAU_CTRL7..DAU_CTRL0];              " DAU control signals 
 PAU_Offset = [PAU_Offset7..PAU_Offset0];        " 8 bits of offset passed to PAU
@@ -119,7 +125,9 @@ ALU_SRC_IR = [0, 1];
 
 " Data data bus source: 
 DDB_SRC_ACCUM = [0, 0, 0, 1];                
-DDB_SRC_FLAGS = [0, 0, 1, 0];                
+DDB_SRC_FLAGS = [0, 0, 1, 0];   
+
+" These are unused for hw9
 DDB_SRC_PC_1 = [0, 1, 0, 0];            
 DDB_SRC_PC_2 = [1, 0, 0, 0];
 
@@ -175,7 +183,7 @@ WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 0]) THEN {
 WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 1, 1]) THEN {
     ALU_CTRL = ALU_CTRL_ADC;
     PAU_CTRL = PAU_INC; 
-    DAU_CTRL = 0;                                     "TODO 
+    DAU_CTRL = 0;                                      
     ALU_Source = ALU_SRC_IR;
     PAU_Offset = .X.;
     DDB_Source = 0;
@@ -236,7 +244,6 @@ WHEN (IR[15..0] == [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]) THEN {
     IO = 0;
 }
 
-" TODO: check this
 " LDI: load Accumulator with immediate value k
 WHEN (IR[15..8] == [1, 0, 0, 0, 1, 0, 0, 1]) THEN {
     ALU_CTRL = ALU_CTRL_LOAD;
@@ -250,7 +257,6 @@ WHEN (IR[15..8] == [1, 0, 0, 0, 1, 0, 0, 1]) THEN {
     IO = 0;
 }
 
-" TODO: check this 
 " STD: store Accumulator direct at (m)
 WHEN (IR[15..8] == [1, 0, 1, 0, 0, 0, 0, 0]) THEN {
     ALU_CTRL = 0;
@@ -264,7 +270,6 @@ WHEN (IR[15..8] == [1, 0, 1, 0, 0, 0, 0, 0]) THEN {
     IO = 0;
 }
 
-" TODO: check this 
 " LDD: load Accumulator direct from (m)
 WHEN (IR[15..8] == [1, 0, 0, 0, 0, 0, 0, 0]) THEN {
     ALU_CTRL = ALU_CTRL_LOAD;
@@ -299,7 +304,7 @@ WHEN (IR[15..8] == [0, 1, 0, 0, 0, 1, 1, 1]) THEN {
     ALU_Source = ALU_SRC_IR;
     PAU_Offset = .X.;
     DDB_Source = 0;
-    RD = 0;                             " TODO: check this
+    RD = 0;                             
     WR = 0;
     IO = 0;
 }
@@ -326,7 +331,7 @@ WHEN (IR[15..0] == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) THEN {
     PAU_Offset = .X.;
     DDB_Source = 0;
     RD = 0;                             
-    WR = 0;                                     " TODO: check this
+    WR = 0;                                     
     IO = 0;
 }
 
@@ -942,7 +947,6 @@ WHEN (IR[15..8] == [0, 1, 0, 0, 1, 1, 1, 1]) THEN {
     IO = 0;
 } 
 
-" TODO: check this
 " OR: Acc OR m 
 WHEN (IR[15..8] == [0, 1, 1, 1, 0, 1, 0, 0]) THEN {
     ALU_CTRL = ALU_CTRL_OR;
