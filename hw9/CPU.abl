@@ -132,7 +132,7 @@ IO = CUnit.IO;
 
 " ALU Inputs
 
-" Hint: mux on the ALU source 
+" Following the hint: mux on the ALU source 
 " ALU_SRC_DB = [1, 0];
 " ALU_SRC_IR = [0, 1];
 
@@ -203,7 +203,9 @@ DataAB = DAUnit.[DataAddr7..DataAddr0];
 " DDB_SRC_PC_1 = [0, 1, 0, 0]; 
 " DDB_SRC_PC_2 = [1, 0, 0, 0];   
 
-" TODO fix this 
+" TODO fix this
+" CALL one of them will be low 8 bits of PC 
+" the other is high 5
 DataDB = ([Accum7..Accum0] & CUnit.DDB_Source0) # 
          ([Flags7..Flags0] & CUnit.DDB_Source1);
 
