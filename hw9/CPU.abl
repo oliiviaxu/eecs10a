@@ -26,8 +26,8 @@ TITLE      'Caltech10 CPU'
 
 " Revision History:
 " 03/11/26  Olivia Xu  Initial Revision
-
-
+" 03/13/26  Olivia Xu  Added muxes to ALU source and DDB source 
+" 03/14/26  Olivia Xu  Added some comments
 
 " Pin/Signal Declarations
 
