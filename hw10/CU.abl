@@ -8,7 +8,8 @@ INTERFACE  (ProgramDB15..ProgramDB0,
             DAU_CTRL7..DAU_CTRL0, 
             ALU_Source1, ALU_Source0, 
             DDB_Source3..DDB_Source0,
-            PAU_Offset7..PAU_Offset0);
+            PAU_Offset7..PAU_Offset0, 
+            FSM2..FSM0);
 
 TITLE      'Control Unit'
 
@@ -16,29 +17,31 @@ TITLE      'Control Unit'
 " Description:    This is the control unit of the Caltech10 CPU. It decodes 
 "                 instructions and generates the control signals needed in the
 "                 ALU, program access unit, and data access unit as well as other
-"                 contorl signals like ALU source, Data data bus source, RD, WR, IO. 
+"                 control signals like ALU source, Data data bus source, RD, WR, IO. 
+"                 There is also a finite state machine for the CALL and RTS instructions.
 "
 " Inputs:         ProgramDB[15..0]  - the 16-bit program data bus
 "                 Flags[7..0]       - 8 bits of flags 
 "                 Reset             - system reset signal
 "                 Clock             - system clock
 " 
-" Outputs:        IR[15..0]         - Instruction register output                  
-"                 RD                - read signal for the data data bus
-"                 WR                - write signal for the data data bus
-"                 IO                - memory (0) or I/O (1) is being accessed
-"                 ALU_CTRL[20..0]   - ALU control signals 
-"                 PAU_CTRL[4..0]    - PAU control signals 
-"                 DAU_CTRL[7..0]    - DAU control signals 
+" Outputs:        IR[15..0]          - Instruction register output                  
+"                 RD                 - read signal for the data data bus
+"                 WR                 - write signal for the data data bus
+"                 IO                 - memory (0) or I/O (1) is being accessed
+"                 ALU_CTRL[20..0]    - ALU control signals 
+"                 PAU_CTRL[4..0]     - PAU control signals 
+"                 DAU_CTRL[7..0]     - DAU control signals 
 "                 ALU_Source[1..0]   - ALU source: either the Data data bus (ALU_Source1) or the IR (ALU_Source0)
 "                 DDB_Source[3..0]   - Data data bus source: either the accum (DDB_Source0), flags (DDB_Source1), program counter 1 (DDB_Source2), or program counter 2 (DDB_Source3) 
 "                 PAU_Offset[7..0]   - 8 bits of data passed to PAU
-
+"                 FSM[2..0]          - 3 bits of the Finite State Machine 
+"
 " Revision History:
 " 03/11/26   Olivia Xu  Initial Revision
 " 03/13/26   Olivia Xu  Added majority of the when statements
 " 03/14/26   Olivia Xu  Added comments 
-
+" 03/15/26   Olivia Xu  Added finite state machine 
 
 " Pin/Signal Declarations
 
@@ -62,7 +65,7 @@ DDB_Source3..DDB_Source0    pin;                "output  the source into the dat
 RD			                pin;	            "output  read signal for the Data data bus
 WR			                pin;	            "output  write signal for the Data data bus
 IO			                pin;	            "output  accessing memory (0) or I/O (1)
-
+FSM2..FSM0                  pin ISTYPE 'REG';   "output  3 bits of Finite State machine  
 
 " Busses
 IR  =  [IR15..IR0];                             " 16 bit instruction register
@@ -73,8 +76,25 @@ DDB_Source = [DDB_Source3..DDB_Source0];        " the source into the data data 
 PAU_CTRL = [PAU_CTRL4..PAU_CTRL0];              " PAU control signals
 DAU_CTRL = [DAU_CTRL7..DAU_CTRL0];              " DAU control signals 
 PAU_Offset = [PAU_Offset7..PAU_Offset0];        " 8 bits of offset passed to PAU
+FSM = [FSM2..FSM0];                             " 3 bits of Finite State Machine 
+
+" Intermediate Terms
+
+IR_CALL_OR_RTS                   node;  " Is 1 if IR == CALL or IR == RTS    
 
 " Constants
+
+" States 
+
+STATE_INIT = [ 0, 0, 0 ];
+STATE_WR_PC_HIGH = [ 0, 0, 1 ];
+STATE_RD_PC_HIGH = [ 0, 1, 0 ];
+STATE_WR_PC_LOW = [ 0, 1, 1 ];
+STATE_DONE = [ 1, 0, 0 ];
+
+" CALL/RTS constants 
+CALL = [1, 1, 1,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.];
+RTS = [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0];
 
 " ALUnit 
 
@@ -101,7 +121,7 @@ ALU_CTRL_LOAD = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 ALU_CTRL_POP  = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
 
 " PAUnit
-
+PAU_HOLD     = [0, 0, 0, 0, 0];
 PAU_INC      = [0, 0, 0, 0, 1];
 PAU_ABSOLUTE = [0, 0, 0, 1, 0];
 PAU_RELATIVE = [0, 0, 1, 0, 0];
@@ -121,6 +141,8 @@ DAU_PRE      = [1, 0, 0, 0, 0, 0, 0, 0]; " Pre (Control7)
 
 DAU_XOFF    = [0, 0, 0, 1, 0, 1, 0, 0]; " X Reg + Offset 
 DAU_SOFF    = [0, 0, 1, 0, 0, 1, 0, 0]; " S Reg + Offset 
+DAU_PREDEC_S = [1, 0, 1, 0, 0, 0, 1, 0]; " Pre decrementing S Reg 
+DAU_POSTINC_S = [0, 0, 1, 0, 0, 0, 0, 1]; " Post incrementing S Reg 
 
 " ALU source: either the data data bus or the instruction register 
 ALU_SRC_DB = [1, 0];
@@ -131,16 +153,122 @@ DDB_SRC_ACCUM = [0, 0, 0, 1];
 DDB_SRC_FLAGS = [0, 0, 1, 0];   
 
 " These are unused for hw9
-DDB_SRC_PC_1 = [0, 1, 0, 0];            
-DDB_SRC_PC_2 = [1, 0, 0, 0];
+DDB_SRC_PC_LOW = [0, 1, 0, 0];            
+DDB_SRC_PC_HIGH = [1, 0, 0, 0];
+
+
+" Truth Table for FSM
+TRUTH_TABLE ([IR, FSM] :> [FSM])
+[ CALL, STATE_INIT ] :> [ STATE_WR_PC_HIGH ];
+[ RTS, STATE_INIT ] :> [ STATE_RD_PC_HIGH ];
+[ CALL, STATE_WR_PC_HIGH ] :> [ STATE_WR_PC_LOW ];
+[ RTS, STATE_RD_PC_HIGH ] :> [ STATE_DONE ];
+[ CALL, STATE_WR_PC_LOW ] :> [ STATE_DONE ];
+[ .X., STATE_DONE ] :> [ STATE_INIT ];
+
 
 EQUATIONS
+
+" TODO: check 
+FSM.CLK = Clock;
+FSM.CLR = Reset;
 
 IR.CLK = Clock;
 IR.CLR = Reset;
 
-IR := ProgramDB;
+IR_CALL_OR_RTS = (IR[15..0] == CALL) # (IR[15..0] == RTS);
 
+" Following the hint: It may be easier to wait until the last cycle to load the IR if executing a CALL or RTS instruction.
+" If IR is not CALL or RTS, or FSM is STATE DONE, then we want IR = programDB
+" IF IR is CALL or RTS, and not STATE DONE, then we want IR to stay the same 
+IR := ((!IR_CALL_OR_RTS # (FSM == STATE_DONE)) & ProgramDB) # 
+       (IR_CALL_OR_RTS & !(FSM == STATE_DONE) & IR);
+
+" CALL
+WHEN ((IR[15..0] == CALL) & (FSM == STATE_INIT)) THEN {
+    ALU_CTRL = 0; 
+    PAU_CTRL = PAU_HOLD; 
+    DAU_CTRL = 0;
+    ALU_Source = 0; 
+    PAU_Offset = 0; 
+    DDB_Source = 0;
+    RD = 0;
+    WR = 0;
+    IO = 0;
+}
+
+WHEN ((IR[15..0] == CALL) & (FSM == STATE_WR_PC_HIGH)) THEN {
+    ALU_CTRL = 0; 
+    PAU_CTRL = PAU_HOLD; 
+    DAU_CTRL = DAU_PREDEC_S;
+    ALU_Source = 0; 
+    PAU_Offset = 0; 
+    DDB_Source = DDB_SRC_PC_HIGH;
+    RD = 0;
+    WR = 1;
+    IO = 0;
+}
+
+WHEN ((IR[15..0] == CALL) & (FSM == STATE_WR_PC_LOW)) THEN {
+    ALU_CTRL = 0; 
+    PAU_CTRL = PAU_ABSOLUTE; 
+    DAU_CTRL = DAU_PREDEC_S;
+    ALU_Source = 0; 
+    PAU_Offset = 0; 
+    DDB_Source = DDB_SRC_PC_LOW;
+    RD = 0;
+    WR = 1;
+    IO = 0;
+}
+
+WHEN ((IR[15..0] == CALL) & (FSM == STATE_DONE)) THEN {
+    ALU_CTRL = 0; 
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;
+    ALU_Source = 0; 
+    PAU_Offset = 0; 
+    DDB_Source = 0;
+    RD = 0;
+    WR = 0;
+    IO = 0;
+}
+
+" RTS 
+WHEN ((IR[15..0] == RTS) & (FSM == STATE_INIT)) THEN {
+    ALU_CTRL = 0; 
+    PAU_CTRL = PAU_RTS_LOW; 
+    DAU_CTRL = DAU_POSTINC_S;                            
+    ALU_Source = 0; 
+    PAU_Offset = 0; 
+    DDB_Source = 0;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+}
+
+WHEN ((IR[15..0] == RTS) & (FSM == STATE_RD_PC_HIGH)) THEN {
+    ALU_CTRL = 0; 
+    PAU_CTRL = PAU_RTS_HIGH; 
+    DAU_CTRL = DAU_POSTINC_S;                            
+    ALU_Source = 0; 
+    PAU_Offset = 0; 
+    DDB_Source = 0;
+    RD = 1;
+    WR = 0;
+    IO = 0;
+}
+
+WHEN ((IR[15..0] == RTS) & (FSM == STATE_DONE)) THEN {
+    ALU_CTRL = 0; 
+    PAU_CTRL = PAU_INC; 
+    DAU_CTRL = 0;                            
+    ALU_Source = 0; 
+    PAU_Offset = 0; 
+    DDB_Source = 0;
+    RD = 0;
+    WR = 0;
+    IO = 0;
+}
 
 " ADC: Adds accumulator, m, carry flag 
 WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 0]) THEN {

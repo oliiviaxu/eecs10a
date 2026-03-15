@@ -28,6 +28,7 @@ TITLE      'Caltech10 CPU'
 " 03/11/26  Olivia Xu  Initial Revision
 " 03/13/26  Olivia Xu  Added muxes to ALU source and DDB source 
 " 03/14/26  Olivia Xu  Added some comments
+" 03/15/26  Olivia Xu  Updated interface for CU to include FSM output 
 
 " Pin/Signal Declarations
 
@@ -101,7 +102,8 @@ CU INTERFACE  (ProgramDB15..ProgramDB0,
             DAU_CTRL7..DAU_CTRL0, 
             ALU_Source1, ALU_Source0, 
             DDB_Source3..DDB_Source0,
-            PAU_Offset7..PAU_Offset0);
+            PAU_Offset7..PAU_Offset0, 
+            FSM2..FSM0);
 
 " create instances of the modules
 PAUnit    FUNCTIONAL_BLOCK  ProgramAccess;
@@ -165,7 +167,9 @@ ALUnit.POP = CUnit.ALU_CTRL20;
 [Flags7..Flags0] = !ALUnit.[Flags7..Flags0];
 
 " PAU Inputs 
-PAUnit.[Offset7..Offset0] = CUnit.[PAU_Offset7..PAU_Offset0];         
+" 2:1 mux with inputs being the data data bus and IR that is selected for offset into PAU 
+" We use RD because if RD = 1, that means DB contains something 
+PAUnit.[Offset7..Offset0] =  (DataDB & RD) # (CUnit.[PAU_Offset7..PAU_Offset0] & !RD);         
 PAUnit.[Direct12..Direct0] = CUnit.[IR12..IR0];                        
 PAUnit.Increment = CUnit.PAU_CTRL0;
 PAUnit.Absolute = CUnit.PAU_CTRL1;
@@ -200,17 +204,15 @@ DataAB = DAUnit.[DataAddr7..DataAddr0];
 " output enables
 
 " Mux for selecting which of the accumulator, flags, and program counter goes into the data data bus for WRITES only 
-" Notes for HW10: 
-" CALL: one of them will be low 8 bits of PC 
-" the other is high 5 
-" TODO: add two more mux inputs for hw10 
 " DDB_SRC_ACCUM = [0, 0, 0, 1];                
 " DDB_SRC_FLAGS = [0, 0, 1, 0];                
-" DDB_SRC_PC_1 = [0, 1, 0, 0]; 
-" DDB_SRC_PC_2 = [1, 0, 0, 0];  
+" DDB_SRC_PC_LOW = [0, 1, 0, 0];                  
+" DDB_SRC_PC_HIGH = [1, 0, 0, 0];  
 
 DataDB = ([Accum7..Accum0] & CUnit.DDB_Source0) # 
-         ([Flags7..Flags0] & CUnit.DDB_Source1);
+         ([Flags7..Flags0] & CUnit.DDB_Source1) # 
+         ([PAUnit.PC7..PAUnit.PC0] & CUnit.DDB_Source2) # 
+         ([0, 0, 0, PAUnit.PC12..PAUnit.PC8] & CUnit.DDB_Source3);
 
 " Data data bus is enabled when writing
 DataDB.OE  =  CUnit.WR;
