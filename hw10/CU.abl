@@ -130,14 +130,14 @@ PAU_RTS_HIGH = [1, 0, 0, 0, 0];
 
 " DAUnit 
 
-DAU_INC      = [0, 0, 0, 0, 0, 0, 0, 1]; " Increment (Control0)
-DAU_DEC      = [0, 0, 0, 0, 0, 0, 1, 0]; " Decrement (Control1)
-DAU_OFF_EN   = [0, 0, 0, 0, 0, 1, 0, 0]; " Offset Enable (Control2)
-DAU_SEL_OFF  = [0, 0, 0, 0, 1, 0, 0, 0]; " m / offset (Control3)
-DAU_SEL_X    = [0, 0, 0, 1, 0, 0, 0, 0]; " X Reg (Control4)
-DAU_SEL_S    = [0, 0, 1, 0, 0, 0, 0, 0]; " S Reg (Control5)
-DAU_SEL_ACC  = [0, 1, 0, 0, 0, 0, 0, 0]; " Accumulator (Control6)
-DAU_PRE      = [1, 0, 0, 0, 0, 0, 0, 0]; " Pre (Control7)
+DAU_INC      = [0, 0, 0, 0, 0, 0, 0, 1]; " Increment
+DAU_DEC      = [0, 0, 0, 0, 0, 0, 1, 0]; " Decrement
+DAU_OFF_EN   = [0, 0, 0, 0, 0, 1, 0, 0]; " Offset Enable
+DAU_SEL_OFF  = [0, 0, 0, 0, 1, 0, 0, 0]; " m / offset
+DAU_SEL_X    = [0, 0, 0, 1, 0, 0, 0, 0]; " X Reg
+DAU_SEL_S    = [0, 0, 1, 0, 0, 0, 0, 0]; " S Reg
+DAU_SEL_ACC  = [0, 1, 0, 0, 0, 0, 0, 0]; " Accumulator
+DAU_PRE      = [1, 0, 0, 0, 0, 0, 0, 0]; " Pre
 
 DAU_XOFF    = [0, 0, 0, 1, 0, 1, 0, 0]; " X Reg + Offset 
 DAU_SOFF    = [0, 0, 1, 0, 0, 1, 0, 0]; " S Reg + Offset 

@@ -63,9 +63,6 @@ SReg7..SReg0		pin;	"the 8-bit S register
 
 " Internal signals
 
-
-
-
 " declare the used modules
 
 " HW6 
