@@ -33,7 +33,7 @@ TITLE      'Control Unit'
 "                 PAU_CTRL[4..0]     - PAU control signals 
 "                 DAU_CTRL[7..0]     - DAU control signals 
 "                 ALU_Source[1..0]   - ALU source: either the Data data bus (ALU_Source1) or the IR (ALU_Source0)
-"                 DDB_Source[3..0]   - Data data bus source: either the accum (DDB_Source0), flags (DDB_Source1), program counter 1 (DDB_Source2), or program counter 2 (DDB_Source3) 
+"                 DDB_Source[3..0]   - Data data bus source: either the accum (DDB_Source0), flags (DDB_Source1), program counter (low 8 bits) (DDB_Source2), or program counter (high 5 bits) (DDB_Source3) 
 "                 PAU_Offset[7..0]   - 8 bits of data passed to PAU
 "                 FSM[2..0]          - 3 bits of the Finite State Machine 
 "
@@ -62,7 +62,7 @@ DAU_CTRL7..DAU_CTRL0        pin;                "output  8 control signals into 
 ALU_Source1                 pin;                "output  Data data bus sourced into ALU
 ALU_Source0                 pin;                "output  IR as source into ALU
 PAU_Offset7..PAU_Offset0    pin;                "output  8 bits of offset into PAU
-DDB_Source3..DDB_Source0    pin;                "output  the source into the data data bus is (following the diagram): accumulator (DDB_Source0), flags (DDB_Source1), program counter 1 (DDB_Source2), or program counter 2 (DDB_Source3) 
+DDB_Source3..DDB_Source0    pin;                "output  the source into the data data bus is (following the diagram): either the accum (DDB_Source0), flags (DDB_Source1), program counter (low 8 bits) (DDB_Source2), or program counter (high 5 bits) (DDB_Source3) 
 RD			                pin;	            "output  read signal for the Data data bus
 WR			                pin;	            "output  write signal for the Data data bus
 IO			                pin;	            "output  accessing memory (0) or I/O (1)
@@ -73,7 +73,7 @@ IR  =  [IR15..IR0];                             " 16 bit instruction register
 ProgramDB = [ProgramDB15..ProgramDB0];          " 16-bit program data bus  
 ALU_CTRL = [ALU_CTRL20..ALU_CTRL0];             " ALU control signals for each instruction 
 ALU_Source = [ALU_Source1, ALU_Source0];        " ALU_Source1 is Data data bus, ALU_Source0 is IR
-DDB_Source = [DDB_Source3..DDB_Source0];        " the source into the data data bus is (following the diagram): accum (DDB_Source0), flags (DDB_Source1), program counter 1 (DDB_Source2), or program counter 2 (DDB_Source3) 
+DDB_Source = [DDB_Source3..DDB_Source0];        " the source into the data data bus is (following the diagram): either the accum (DDB_Source0), flags (DDB_Source1), program counter (low 8 bits) (DDB_Source2), or program counter (high 5 bits) (DDB_Source3) 
 PAU_CTRL = [PAU_CTRL4..PAU_CTRL0];              " PAU control signals
 DAU_CTRL = [DAU_CTRL7..DAU_CTRL0];              " DAU control signals 
 PAU_Offset = [PAU_Offset7..PAU_Offset0];        " 8 bits of offset passed to PAU
@@ -207,7 +207,8 @@ WHEN ((IR[15..0] == CALL) & (FSM == STATE_INIT)) THEN {
 }
 
 " CALL (STATE_WR_PC_HIGH)
-" We are predecrementing S, andthen S is set to high five bits of the program counter  
+" We are predecrementing S, andthen S is set to high five bits of the program counter
+" S is padded with zeroes here since its 8 bits 
 WHEN ((IR[15..0] == CALL) & (FSM == STATE_WR_PC_HIGH)) THEN {
     ALU_CTRL = 0; 
     PAU_CTRL = PAU_HOLD; 
