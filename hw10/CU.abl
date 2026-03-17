@@ -42,6 +42,7 @@ TITLE      'Control Unit'
 " 03/13/26   Olivia Xu  Added majority of the when statements
 " 03/14/26   Olivia Xu  Added comments 
 " 03/15/26   Olivia Xu  Added finite state machine 
+" 03/17/26   Olivia Xu  Added CALL/RTS comments
 
 " Pin/Signal Declarations
 
@@ -80,7 +81,7 @@ FSM = [FSM2..FSM0];                             " 3 bits of Finite State Machine
 
 " Intermediate Terms
 
-IR_CALL_OR_RTS                   node;  " Is 1 if IR == CALL or IR == RTS    
+IR_CALL_OR_RTS                   node;  " Is 1 if (IR == CALL or IR == RTS)    
 
 " Constants
 
@@ -97,6 +98,8 @@ CALL = [1, 1, 1,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.,.X.];
 RTS = [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0];
 
 " ALUnit 
+
+" Below are the control signals for the ALU, one-hot encoded for each instruction
 
 ALU_CTRL_ADD  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]; 
 ALU_CTRL_ADC  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]; 
@@ -121,6 +124,9 @@ ALU_CTRL_LOAD = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 ALU_CTRL_POP  = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; 
 
 " PAUnit
+
+" Below are the control signals for the PAU
+
 PAU_HOLD     = [0, 0, 0, 0, 0];
 PAU_INC      = [0, 0, 0, 0, 1];
 PAU_ABSOLUTE = [0, 0, 0, 1, 0];
@@ -130,34 +136,36 @@ PAU_RTS_HIGH = [1, 0, 0, 0, 0];
 
 " DAUnit 
 
+" BElow are the control signals for the DAU 
+
 DAU_INC      = [0, 0, 0, 0, 0, 0, 0, 1]; " Increment
 DAU_DEC      = [0, 0, 0, 0, 0, 0, 1, 0]; " Decrement
 DAU_OFF_EN   = [0, 0, 0, 0, 0, 1, 0, 0]; " Offset Enable
-DAU_SEL_OFF  = [0, 0, 0, 0, 1, 0, 0, 0]; " m / offset
-DAU_SEL_X    = [0, 0, 0, 1, 0, 0, 0, 0]; " X Reg
-DAU_SEL_S    = [0, 0, 1, 0, 0, 0, 0, 0]; " S Reg
-DAU_SEL_ACC  = [0, 1, 0, 0, 0, 0, 0, 0]; " Accumulator
+DAU_SEL_OFF  = [0, 0, 0, 0, 1, 0, 0, 0]; " Source: m / offset
+DAU_SEL_X    = [0, 0, 0, 1, 0, 0, 0, 0]; " Source: X Reg
+DAU_SEL_S    = [0, 0, 1, 0, 0, 0, 0, 0]; " Source: S Reg
+DAU_SEL_ACC  = [0, 1, 0, 0, 0, 0, 0, 0]; " Source: Accumulator
 DAU_PRE      = [1, 0, 0, 0, 0, 0, 0, 0]; " Pre
+
+" Other DAU control signal configurations
 
 DAU_XOFF    = [0, 0, 0, 1, 0, 1, 0, 0]; " X Reg + Offset 
 DAU_SOFF    = [0, 0, 1, 0, 0, 1, 0, 0]; " S Reg + Offset 
 DAU_PREDEC_S = [1, 0, 1, 0, 0, 0, 1, 0]; " Pre decrementing S Reg 
 DAU_POSTINC_S = [0, 0, 1, 0, 0, 0, 0, 1]; " Post incrementing S Reg 
 
-" ALU source: either the data data bus or the instruction register 
-ALU_SRC_DB = [1, 0];
-ALU_SRC_IR = [0, 1];
+" ALU source: either the data data bus or the instruction register, following the diagram 
+ALU_SRC_DB = [1, 0];                        " ALU source is the data data bus
+ALU_SRC_IR = [0, 1];                        " ALU source is the instruction register 
 
 " Data data bus source: 
-DDB_SRC_ACCUM = [0, 0, 0, 1];                
-DDB_SRC_FLAGS = [0, 0, 1, 0];   
-
-" These are unused for hw9
-DDB_SRC_PC_LOW = [0, 1, 0, 0];            
-DDB_SRC_PC_HIGH = [1, 0, 0, 0];
+DDB_SRC_ACCUM = [0, 0, 0, 1];           " Data data bus source is the accumulator         
+DDB_SRC_FLAGS = [0, 0, 1, 0];           " Data data bus source is the flags from ALU 
+DDB_SRC_PC_LOW = [0, 1, 0, 0];          " Data data bus source is the program counter (low 8 bits)
+DDB_SRC_PC_HIGH = [1, 0, 0, 0];         " Data data bus source is the program counter (high 5 bits)
 
 
-" Truth Table for FSM
+" Truth Table for FSM 
 TRUTH_TABLE ([IR, FSM] :> [FSM])
 [ CALL, STATE_INIT ] :> [ STATE_WR_PC_HIGH ];
 [ RTS, STATE_INIT ] :> [ STATE_RD_PC_HIGH ];
@@ -168,14 +176,14 @@ TRUTH_TABLE ([IR, FSM] :> [FSM])
 
 
 EQUATIONS
-
-" TODO: check 
+ 
 FSM.CLK = Clock;
 FSM.CLR = Reset;
 
 IR.CLK = Clock;
 IR.CLR = Reset;
 
+" is 1 if IR == CALL or IR == RTS, 0 otherwise 
 IR_CALL_OR_RTS = (IR[15..0] == CALL) # (IR[15..0] == RTS);
 
 " Following the hint: It may be easier to wait until the last cycle to load the IR if executing a CALL or RTS instruction.
@@ -184,7 +192,8 @@ IR_CALL_OR_RTS = (IR[15..0] == CALL) # (IR[15..0] == RTS);
 IR := ((!IR_CALL_OR_RTS # (FSM == STATE_DONE)) & ProgramDB) # 
        (IR_CALL_OR_RTS & !(FSM == STATE_DONE) & IR);
 
-" CALL
+" CALL (STATE_INIT)
+" direct subroutine call
 WHEN ((IR[15..0] == CALL) & (FSM == STATE_INIT)) THEN {
     ALU_CTRL = 0; 
     PAU_CTRL = PAU_HOLD; 
@@ -197,6 +206,8 @@ WHEN ((IR[15..0] == CALL) & (FSM == STATE_INIT)) THEN {
     IO = 0;
 }
 
+" CALL (STATE_WR_PC_HIGH)
+" We are predecrementing S, andthen S is set to high five bits of the program counter  
 WHEN ((IR[15..0] == CALL) & (FSM == STATE_WR_PC_HIGH)) THEN {
     ALU_CTRL = 0; 
     PAU_CTRL = PAU_HOLD; 
@@ -209,6 +220,8 @@ WHEN ((IR[15..0] == CALL) & (FSM == STATE_WR_PC_HIGH)) THEN {
     IO = 0;
 }
 
+" CALL (STATE_WR_PC_LOW)
+" We are predecrementing S, andthen S is set to low 8 bits of the program counter. PC is then set to a (absolute for PAU). 
 WHEN ((IR[15..0] == CALL) & (FSM == STATE_WR_PC_LOW)) THEN {
     ALU_CTRL = 0; 
     PAU_CTRL = PAU_ABSOLUTE; 
@@ -221,6 +234,7 @@ WHEN ((IR[15..0] == CALL) & (FSM == STATE_WR_PC_LOW)) THEN {
     IO = 0;
 }
 
+" CALL (STATE_DONE)
 WHEN ((IR[15..0] == CALL) & (FSM == STATE_DONE)) THEN {
     ALU_CTRL = 0; 
     PAU_CTRL = PAU_INC; 
@@ -233,7 +247,9 @@ WHEN ((IR[15..0] == CALL) & (FSM == STATE_DONE)) THEN {
     IO = 0;
 }
 
-" RTS 
+" RTS (STATE_INIT)
+" return from subroutine
+" low 8 bits of PC is set to whatevers in S, S is then post incremented 
 WHEN ((IR[15..0] == RTS) & (FSM == STATE_INIT)) THEN {
     ALU_CTRL = 0; 
     PAU_CTRL = PAU_RTS_LOW; 
@@ -246,6 +262,8 @@ WHEN ((IR[15..0] == RTS) & (FSM == STATE_INIT)) THEN {
     IO = 0;
 }
 
+" RTS (STATE_RD_PC_HIGH)
+" high 5 bits of PC is set to whatevers iin S, S is then post incremented
 WHEN ((IR[15..0] == RTS) & (FSM == STATE_RD_PC_HIGH)) THEN {
     ALU_CTRL = 0; 
     PAU_CTRL = PAU_RTS_HIGH; 
@@ -258,6 +276,7 @@ WHEN ((IR[15..0] == RTS) & (FSM == STATE_RD_PC_HIGH)) THEN {
     IO = 0;
 }
 
+" RTS (STATE_DONE)
 WHEN ((IR[15..0] == RTS) & (FSM == STATE_DONE)) THEN {
     ALU_CTRL = 0; 
     PAU_CTRL = PAU_INC; 
@@ -269,6 +288,8 @@ WHEN ((IR[15..0] == RTS) & (FSM == STATE_DONE)) THEN {
     WR = 0;
     IO = 0;
 }
+
+" Below are the other instructions for HW9/10
 
 " ADC: Adds accumulator, m, carry flag 
 WHEN (IR[15..8] == [0, 1, 1, 0, 0, 0, 0, 0]) THEN {

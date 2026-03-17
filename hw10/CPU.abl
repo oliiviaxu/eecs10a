@@ -200,7 +200,7 @@ DataAB = DAUnit.[DataAddr7..DataAddr0];
 
 " output enables
 
-" Mux for selecting which of the accumulator, flags, and program counter goes into the data data bus for WRITES only 
+" Mux for selecting which of the accumulator, flags, and program counter goes into the data data bus for writes only 
 " DDB_SRC_ACCUM = [0, 0, 0, 1];                
 " DDB_SRC_FLAGS = [0, 0, 1, 0];                
 " DDB_SRC_PC_LOW = [0, 1, 0, 0];                  
